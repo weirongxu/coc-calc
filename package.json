@@ -42,6 +42,11 @@
   "license": "MIT",
   "author": "weirongxu.raidou@gmail.com",
   "publisher": "weirongxu",
+  "homepage": "https://github.com/weirongxu/coc-calc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weirongxu/coc-calc.git"
+  },
   "devDependencies": {
     "@chemzqm/tslint-config": "^1.0.18",
     "@types/jest": "^24.0.12",
