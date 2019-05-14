@@ -7,6 +7,7 @@
       "es2017"
     ],
     "jsx": "react",
+    "declaration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "noImplicitReturns": true,
