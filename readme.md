@@ -2,6 +2,8 @@
 
 Calculate extension for coc.nvim
 
+[![Build Status](https://travis-ci.com/weirongxu/coc-calc.svg?branch=master)](https://travis-ci.com/weirongxu/coc-calc)
+
 ## Features
 
 * Support bignumber, use [decimal.js](https://github.com/MikeMcl/decimal.js)
