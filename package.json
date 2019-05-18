@@ -15,7 +15,7 @@
     "test": "jest"
   },
   "files": [
-    "libs"
+    "lib"
   ],
   "engines": {
     "coc": "^0.0.56"
