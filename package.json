@@ -1,6 +1,6 @@
 {
   "name": "coc-calc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "calculate extension for coc.nvim",
   "main": "lib/index.js",
   "keywords": [
