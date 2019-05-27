@@ -108,7 +108,6 @@ test('calc base', () => {
 });
 
 test('calc with error', () => {
-  // expect(() => calculate('0.1 +++ 10')).toThrow();
   expect(() => calculate('0.1 *** 10')).toThrow();
   expect(() => calculate('unvalid0.1')).toThrow();
 });
