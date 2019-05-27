@@ -1,4 +1,4 @@
-import { calculate, decimalP, unaryExpP, atomicP } from './calc-parser';
+import { calculate, decimalP, unaryExprP, atomicP } from './calc-parser';
 
 const tryParseValue = (parser: any, s: string) => {
   try {
@@ -32,13 +32,17 @@ test('parse atomic', () => {
 });
 
 test('parse unaryExpression', () => {
-  expect(tryParseValue(unaryExpP, '1')).toEqual('1');
-  expect(tryParseValue(unaryExpP, '+1')).toEqual('1');
-  expect(tryParseValue(unaryExpP, '-1')).toEqual('-1');
-  expect(tryParseValue(unaryExpP, '+3.141592653589793')).toEqual('3.141592653589793');
-  expect(tryParseValue(unaryExpP, '-1.2e5')).toEqual('-120000');
-  expect(tryParseValue(unaryExpP, '-1.2e+5')).toEqual('-120000');
-  expect(tryParseValue(unaryExpP, '1.2e-5')).toEqual('0.000012');
+  expect(tryParseValue(unaryExprP, '1')).toEqual('1');
+  expect(tryParseValue(unaryExprP, '+1')).toEqual('1');
+  expect(tryParseValue(unaryExprP, '++1')).toEqual('1');
+  expect(tryParseValue(unaryExprP, '+++1')).toEqual('1');
+  expect(tryParseValue(unaryExprP, '-1')).toEqual('-1');
+  expect(tryParseValue(unaryExprP, '--1')).toEqual('1');
+  expect(tryParseValue(unaryExprP, '---1')).toEqual('-1');
+  expect(tryParseValue(unaryExprP, '+3.141592653589793')).toEqual('3.141592653589793');
+  expect(tryParseValue(unaryExprP, '-1.2e5')).toEqual('-120000');
+  expect(tryParseValue(unaryExprP, '-1.2e+5')).toEqual('-120000');
+  expect(tryParseValue(unaryExprP, '1.2e-5')).toEqual('0.000012');
 });
 
 test('calc base', () => {
@@ -49,12 +53,14 @@ test('calc base', () => {
   expect(calValue('( 0.2) + (0.1)')).toEqual('0.3');
   expect(calValue('( 0.2) + ( 0.1)')).toEqual('0.3');
   expect(calValue('0.1 ++0.1++ 0.1')).toEqual('0.3');
+  expect(calValue('0.1 +++0.1+++ 0.1')).toEqual('0.3');
 
   expect(calValue('0.1 * 0.2')).toEqual('0.02');
   expect(calValue('0.1 *+ 0.2')).toEqual('0.02');
   expect(calValue('0.2 / - 0.1')).toEqual('-2');
   expect(calValue('2 ** 2')).toEqual('4');
   expect(calValue('2 **- 2')).toEqual('0.25');
+  expect(calValue('-2 ** 2')).toEqual('-4');
   expect(calValue('4 % 3')).toEqual('1');
 
   expect(calValue('0.1 - 0.1 - 0.1')).toEqual('-0.1');
@@ -63,7 +69,11 @@ test('calc base', () => {
   expect(calValue('(0.1 - 0.1) - 0.1')).toEqual('-0.1');
   expect(calValue('0.1 - (0.1 - 0.1)')).toEqual('0.1');
   expect(calValue('(0.1 - 0.1 - 0.1)')).toEqual('-0.1');
+  expect(calValue('-(0.1 - 0.1 - 0.1)')).toEqual('0.1');
   expect(calValue('0.1 - ((0.1 - (0.2 + 0.1)))')).toEqual('0.3');
+  expect(calValue('0.1 - -((0.1 - (0.2 + 0.1)))')).toEqual('-0.1');
+  expect(calValue('0.1 - --((0.1 - (0.2 + 0.1)))')).toEqual('0.3');
+  expect(calValue('0.1 - ---((0.1 - (0.2 + 0.1)))')).toEqual('-0.1');
 
   expect(calValue('0.1 / 0.1 / 0.1')).toEqual('10');
   expect(calValue('0.1 / 0.1 / + ( 0.1 )')).toEqual('10');
@@ -90,10 +100,15 @@ test('calc base', () => {
   expect(calValue('(1 - 0.2) * (0.2 - 0.1) * 0.1')).toEqual('0.008');
   expect(calValue('(1 - 0.2 * (0.2 - 0.1)) * 0.1')).toEqual('0.098');
   expect(calValue('(1 - 0.2 * ((0.2 - 0.1)) * 0.1)')).toEqual('0.998');
+  expect(calValue('(1 + 0.1) - (0.01 + 0.001)')).toEqual('1.089');
+
+  expect(calValue('2 * 2 ** 2')).toEqual('8');
+  expect(calValue('4 ** 3 ** 2')).toEqual('262144');
+  expect(calValue('( 4 ** 3 ) ** 2')).toEqual('4096');
 });
 
 test('calc with error', () => {
-  expect(() => calculate('0.1 +++ 10')).toThrow();
+  // expect(() => calculate('0.1 +++ 10')).toThrow();
   expect(() => calculate('0.1 *** 10')).toThrow();
   expect(() => calculate('unvalid0.1')).toThrow();
 });
@@ -107,6 +122,7 @@ test('calc with constant', () => {
 
 test('calc with function', () => {
   expect(calValue('sin(PI/2)')).toEqual('1');
+  expect(calValue('-sin(PI/2)')).toEqual('-1');
   expect(calValue('add(1, 2)')).toEqual('3');
   expect(calValue('add(1, add(2, 1))')).toEqual('4');
   expect(calValue('add(add(1, 2), add(2, 1))')).toEqual('6');
