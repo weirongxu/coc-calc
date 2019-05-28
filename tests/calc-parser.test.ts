@@ -1,4 +1,4 @@
-import { calculate, decimalP, unaryExprP, atomicP } from './calc-parser';
+import { calculate, decimalP, unaryExprP, atomicP } from '../src/calc-parser';
 
 const tryParseValue = (parser: any, s: string) => {
   try {

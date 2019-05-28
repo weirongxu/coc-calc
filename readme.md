@@ -10,6 +10,7 @@ Calculate extension for coc.nvim
 * Suppoort [Mathematics functions](http://mikemcl.github.io/decimal.js/#methods)
 
 ## Screenshot
+
 ![](https://user-images.githubusercontent.com/1709861/57681026-7185a500-7661-11e9-9e80-130090e8a10f.png)
 ![](https://user-images.githubusercontent.com/1709861/57681030-734f6880-7661-11e9-937a-1f3521d00343.png)
 
@@ -36,10 +37,12 @@ Precedence is from highest to lowest.
 | addition / subtraction                | `.2 - .1` `.1 + .2`                         |
 
 ## Mathematics Constant
+
 * `E`
 * `PI`
 
 ## Mathematics Functions
+
 http://mikemcl.github.io/decimal.js/#methods
 
 ## License

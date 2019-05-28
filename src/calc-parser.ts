@@ -348,11 +348,9 @@ export const exprP: P.Parser<RootExpr> = P.alt(binaryOptExprP, unaryExprP)
   .trim(_)
   .desc('expression');
 
-export const expSkipEqualSignP = exprP.skip(
-  P.string('=')
-    .trim(_)
-    .times(0, 1)
-);
+export const skipEqualSignP = P.string('=').trim(_).times(0, 1)
+
+export const exprSkipEqualSignP = exprP.skip(skipEqualSignP);
 
 export const skipInvalidTextP = (
   skip: number = 0
@@ -362,7 +360,7 @@ export const skipInvalidTextP = (
 }> =>
   P.lazy(() =>
     P.alt(
-      P.seq(P.whitespace, expSkipEqualSignP).map(([s, ast]) => ({
+      P.seq(P.whitespace, exprSkipEqualSignP).map(([s, ast]) => ({
         skip: skip + s.length,
         ast
       })),
@@ -371,7 +369,7 @@ export const skipInvalidTextP = (
   ).desc('main');
 
 export const mainP = P.alt(
-  expSkipEqualSignP.map(ast => ({
+  exprSkipEqualSignP.map(ast => ({
     skip: 0,
     ast
   })),

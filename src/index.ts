@@ -85,10 +85,11 @@ class CalcProvider implements CompletionItemProvider {
   // }
 }
 
-export const activate = async (_context: ExtensionContext) => {
-  let config = workspace.getConfiguration('calc');
+export const activate = async (context: ExtensionContext) => {
+  const { subscriptions } = context;
+  const config = workspace.getConfiguration('calc');
 
-  languages.registerCompletionItemProvider(
+  const disposable = languages.registerCompletionItemProvider(
     'calc',
     'CALC',
     null,
@@ -96,4 +97,5 @@ export const activate = async (_context: ExtensionContext) => {
     ['=', ' '],
     config.get<number>('priority', 99)
   );
+  subscriptions.push(disposable);
 };
