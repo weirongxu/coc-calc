@@ -30,7 +30,6 @@ Precedence is from highest to lowest.
 
 | Operator                              | Example                                     |
 |---------------------------------------|---------------------------------------------|
-| function call `sin()`                 | `sin(PI)`                                   |
 | exponentiation `**`                   | `4 ** 3 ** 2` equivalent to `4 ** (3 ** 2)` |
 | unary `+ -`                           | `-2` `+2`                                   |
 | multiply / divide / remainder `* / %` | `4 % 3` `4 * 3`                             |
