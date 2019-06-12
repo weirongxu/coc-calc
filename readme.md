@@ -53,7 +53,7 @@ pow, random, round, sign, sin,
 sinh, sqrt, sub, tan, tanh, trunc
 ```
 
-Detials: http://mikemcl.github.io/decimal.js/#methods
+Details: http://mikemcl.github.io/decimal.js/#methods
 
 ## License
 
