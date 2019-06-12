@@ -13,6 +13,7 @@ Calculate extension for coc.nvim
 
 ![](https://user-images.githubusercontent.com/1709861/57681026-7185a500-7661-11e9-9e80-130090e8a10f.png)
 ![](https://user-images.githubusercontent.com/1709861/57681030-734f6880-7661-11e9-937a-1f3521d00343.png)
+![](https://user-images.githubusercontent.com/1709861/59339628-1e257600-8d37-11e9-8ee4-da4e020bd59f.png)
 
 ## Usage
 
@@ -42,7 +43,17 @@ Precedence is from highest to lowest.
 
 ## Mathematics Functions
 
-http://mikemcl.github.io/decimal.js/#methods
+```
+abs, acos, acosh, add, asin,
+asinh, atan, atanh, atan2, cbrt
+ceil, cos, cosh, div, exp,
+floor, hypot, ln, log, log2,
+log10, max, min, mod, mul,
+pow, random, round, sign, sin,
+sinh, sqrt, sub, tan, tanh, trunc
+```
+
+Detials: http://mikemcl.github.io/decimal.js/#methods
 
 ## License
 
