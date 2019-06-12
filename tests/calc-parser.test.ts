@@ -108,8 +108,8 @@ test('calc base', () => {
 });
 
 test('calc with error', () => {
-  expect(() => calculate('0.1 *** 10')).toThrow();
-  expect(() => calculate('unvalid0.1')).toThrow();
+  expect(() => calculate('***')).toThrow();
+  expect(() => calculate('unvalid')).toThrow();
 });
 
 test('calc with constant', () => {
@@ -130,15 +130,27 @@ test('calc with function', () => {
 
 test('calc with invalid text', () => {
   expect(calculate('some text 1.321')).toEqual({
-    skip: 10,
+    skip: 9,
     result: '1.321',
   });
   expect(calculate('invalid text 1.321 = ')).toEqual({
-    skip: 13,
+    skip: 12,
     result: '1.321'
   });
   expect(calculate('invalid text\t1.321=')).toEqual({
-    skip: 13,
+    skip: 12,
     result: '1.321'
   });
+  expect(calculate('Math.floor(seconds / 2 / 1 =')).toEqual({
+    skip: 20,
+    result: '2'
+  });
+  expect(calculate('E 1 + 1 =')).toEqual({
+    skip: 2,
+    result: '2'
+  })
+  expect(calculate('1 + 1 = 2 + 3 = 5 + 5 =')).toEqual({
+    skip: 16,
+    result: '10'
+  })
 });

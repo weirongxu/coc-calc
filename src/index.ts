@@ -40,12 +40,12 @@ class CalcProvider implements CompletionItemProvider {
     _context: CompletionContext
   ): ProviderResult<CompletionItem[]> {
     const startPosition = Position.create(position.line, 0);
-    const text = document.getText(Range.create(startPosition, position));
-    if (!text.trim().endsWith('=')) {
+    const expr = document.getText(Range.create(startPosition, position));
+    if (!expr.trim().endsWith('=')) {
       return [];
     }
     try {
-      const { skip, result } = calculate(text);
+      const { skip, result } = calculate(expr);
       // this.highlightDisposable = languages.registerDocumentHighlightProvider([{
       //   scheme: document.uri,
       // }], new CalcDocumentHighlightProvider(Range.create(
@@ -54,12 +54,12 @@ class CalcProvider implements CompletionItemProvider {
       //   position.line,
       //   position.character
       // )));
-      const newText = text.endsWith(' ') ? result : ' ' + result;
+      const newText = expr.endsWith(' ') ? result : ' ' + result;
       return [
         {
           label: result,
           kind: CompletionItemKind.Constant,
-          documentation: text.slice(skip) + newText,
+          documentation: expr.slice(skip).trimLeft() + newText,
           textEdit: {
             range: Range.create(
               position.line,

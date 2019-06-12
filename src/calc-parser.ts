@@ -219,11 +219,16 @@ export const decimalP = P.regexp(
   .map(str => new Decimal(str))
   .desc('decimal');
 
-export const constantP = P.regexp(/[A-Z_][A-Z_0-9]*/)
+export const includesP = (ss: string[]) => P.alt(...ss.map(s => P.string(s)))
+
+// export const constantP = P.regexp(/[A-Z_][A-Z_0-9]*/)
+export const constantP = includesP(ConstSyms)
   .map(str => new Constant(str))
   .desc('constant');
 
-export const funcNameP = P.regexp(/[A-Z_a-z]\w*/).desc('functionName');
+// export const funcNameP = P.regexp(/[A-Z_a-z]\w*/).desc('functionName');
+export const funcNameP = includesP(Object.keys(FuncNameEnum))
+  .desc('functionName');
 
 export const funcCallP = P.lazy(() =>
   P.seq(
@@ -350,43 +355,49 @@ export const exprP: P.Parser<RootExpr> = P.alt(binaryOptExprP, unaryExprP)
 
 export const skipEqualSignP = P.string('=').trim(_).times(0, 1)
 
-export const exprSkipEqualSignP = exprP.skip(skipEqualSignP);
-
-export const skipInvalidTextP = (
-  skip: number = 0
-): P.Parser<{
-  skip: number;
-  ast: RootExpr;
-}> =>
-  P.lazy(() =>
-    P.alt(
-      P.seq(P.whitespace, exprSkipEqualSignP).map(([s, ast]) => ({
-        skip: skip + s.length,
-        ast
-      })),
-      P.any.then(skipInvalidTextP(skip + 1))
-    )
-  ).desc('main');
-
-export const mainP = P.alt(
-  exprSkipEqualSignP.map(ast => ({
-    skip: 0,
-    ast
-  })),
-  skipInvalidTextP()
-).desc('main');
+export const mainP = exprP.skip(skipEqualSignP).desc('main');
 
 export const parse = (text: string) => mainP.tryParse(text);
 
 export const printAst = (text: string) => {
-  const { ast } = parse(text);
+  const ast = parse(text);
   console.log(JSON.stringify(ast, null, 2));
 };
 
-export const calculate = (text: string) => {
-  const { skip, ast } = parse(text);
-  return {
-    skip,
-    result: ast.result.valueOf()
-  };
+export const calculate = (
+  text: string,
+  skip: number = 0,
+  skipRecords: number[] = [],
+  originText: string = text
+): {
+  skip: number;
+  result: string;
+} => {
+  try {
+    const ast = parse(text);
+    return {
+      skip,
+      result: ast.result.valueOf()
+    };
+  } catch (e) {
+    if (e.type === 'ParsimmonError') {
+      if (e.result.index.offset < 1) {
+        skipRecords.push(0);
+      }
+      const offset = Math.max(1, e.result.index.offset);
+      if (offset < text.length - 1) {
+        const newSkip = skip + offset;
+        return calculate(
+          text.slice(offset),
+          newSkip,
+          [...skipRecords, newSkip],
+          originText,
+        );
+      }
+    }
+    const highlightSkipRecords = Array.from(Array(originText.length))
+      .map((_, index) => skipRecords.includes(index) ? '✗' : ' ')
+      .join('');
+    throw new Error(['CalculateError:', originText, highlightSkipRecords].join('\r\n'));
+  }
 };
