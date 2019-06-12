@@ -41,7 +41,7 @@ class CalcProvider implements CompletionItemProvider {
   ): ProviderResult<CompletionItem[]> {
     const startPosition = Position.create(position.line, 0);
     const expr = document.getText(Range.create(startPosition, position));
-    if (!expr.trim().endsWith('=')) {
+    if (!expr.trimRight().endsWith('=')) {
       return [];
     }
     try {
@@ -54,12 +54,12 @@ class CalcProvider implements CompletionItemProvider {
       //   position.line,
       //   position.character
       // )));
-      const newText = expr.endsWith(' ') ? result : ' ' + result;
+      const newText = expr.endsWith(' =') ? ' ' + result : result;
       return [
         {
           label: result,
           kind: CompletionItemKind.Constant,
-          documentation: expr.slice(skip).trimLeft() + newText,
+          documentation: '`' + expr.slice(skip).trimLeft() + newText + '`',
           textEdit: {
             range: Range.create(
               position.line,
