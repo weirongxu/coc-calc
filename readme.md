@@ -11,9 +11,8 @@ Calculate extension for coc.nvim
 
 ## Screenshot
 
-![](https://user-images.githubusercontent.com/1709861/57681026-7185a500-7661-11e9-9e80-130090e8a10f.png)
-![](https://user-images.githubusercontent.com/1709861/57681030-734f6880-7661-11e9-937a-1f3521d00343.png)
-![](https://user-images.githubusercontent.com/1709861/59339628-1e257600-8d37-11e9-8ee4-da4e020bd59f.png)
+![screenshot](https://user-images.githubusercontent.com/1709861/60494409-55a59380-9ce1-11e9-9f7e-769588f8e756.png)
+![screenshot](https://user-images.githubusercontent.com/1709861/60494462-740b8f00-9ce1-11e9-8d21-ca241bbc4d68.png)
 
 ## Usage
 
