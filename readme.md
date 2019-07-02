@@ -25,6 +25,12 @@ Calculate extension for coc.nvim
     ```
     sin(PI / 2) =
     ```
+
+## Configurations
+
+* `calc.priority`, calc priority, default: `99`
+* `calc.highlight`, enable calc highlight, default: `true`
+
 ## Operators
 
 Precedence is from highest to lowest.

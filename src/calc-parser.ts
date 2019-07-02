@@ -93,7 +93,7 @@ export class BinaryOpt {
 
 export abstract class Node {
   type: string;
-  result: DecimalLib;
+  result!: DecimalLib;
 
   constructor() {
     this.type = this.constructor.name;
@@ -137,7 +137,6 @@ export class FuncCall extends Node {
       throw new Error(`Function ${this.rawFuncName} not exists`);
     }
     this.funcNameSym = this.rawFuncName as FuncNameSyms;
-    super();
     this.registerResult(() => {
       // @ts-ignore
       return DecimalLib[this.funcNameSym](...args.map(a => a.result));

@@ -18,7 +18,7 @@
     "lib"
   ],
   "engines": {
-    "coc": "^0.0.56"
+    "coc": "^0.0.71"
   },
   "activationEvents": [
     "*"
@@ -34,7 +34,13 @@
         },
         "calc.priority": {
           "type": "integer",
-          "default": 99
+          "default": 99,
+          "description": "Calc priority"
+        },
+        "calc.highlight": {
+          "type": "boolean",
+          "description": "Enable calc highlight",
+          "default": true
         }
       }
     }
@@ -49,13 +55,13 @@
   },
   "devDependencies": {
     "@chemzqm/tslint-config": "^1.0.18",
-    "@types/jest": "^24.0.12",
-    "@types/node": "^12.0.0",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.0.10",
     "@types/parsimmon": "^1.10.0",
-    "coc.nvim": "^0.0.66",
+    "coc.nvim": "^0.0.71",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.2"
   },
   "dependencies": {
     "decimal.js": "^10.2.0",

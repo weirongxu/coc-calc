@@ -2,20 +2,12 @@
   "compilerOptions": {
     "outDir": "lib",
     "module": "commonjs",
-    "target": "es5",
-    "lib": [
-      "es2017"
-    ],
-    "jsx": "react",
+    "target": "es6",
     "declaration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strict": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

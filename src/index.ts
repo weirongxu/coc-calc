@@ -3,8 +3,7 @@ import {
   languages,
   ExtensionContext,
   CompletionItemProvider,
-  CompletionContext,
-  ProviderResult
+  CompletionContext
 } from 'coc.nvim';
 import {
   TextDocument,
@@ -16,29 +15,52 @@ import {
 } from 'vscode-languageserver-protocol';
 import { calculate } from './calc-parser';
 
-// class CalcDocumentHighlightProvider implements DocumentHighlightProvider {
-//   constructor(public range: Range) {
-//   }
-//
-//   provideDocumentHighlights(): ProviderResult<ColorInformation[]> {
-//     return [{
-//       range: this.range,
-//       color: Color.create(100, 180, 150, 1),
-//     }];
-//   }
-// }
-
 class CalcProvider implements CompletionItemProvider {
-  // highlightDisposable: Disposable;
+  private srdId: number;
+  private matchIds: Set<number> = new Set();
 
-  constructor(public isDebug: boolean) {}
+  constructor(public isDebug: boolean) {
+    this.srdId = workspace.createNameSpace('coc-calc');
 
-  public provideCompletionItems(
+    workspace.registerKeymap(['i'], '<ESC>', () => {
+      this.clearHighlight();
+    });
+    workspace.registerAutocmd({
+      event: 'CursorMoved',
+      callback: () => {
+        this.clearHighlight();
+      }
+    });
+    workspace.registerAutocmd({
+      event: 'CursorMovedI',
+      callback: () => {
+        this.clearHighlight();
+      }
+    });
+  }
+
+  public async highlight(range: Range) {
+    workspace.showMessage(range.toString(), 'error');
+    const document = await workspace.document;
+    const matchIds = document.highlightRanges(
+      [range],
+      'CocCalcFormule',
+      this.srdId
+    );
+    matchIds.forEach(id => this.matchIds.add(id));
+  }
+
+  public async clearHighlight() {
+    const document = await workspace.document;
+    document.clearMatchIds(this.matchIds);
+  }
+
+  public async provideCompletionItems(
     document: TextDocument,
     position: Position,
     _token: CancellationToken,
     _context: CompletionContext
-  ): ProviderResult<CompletionItem[]> {
+  ): Promise<CompletionItem[]> {
     const startPosition = Position.create(position.line, 0);
     const expr = document.getText(Range.create(startPosition, position));
     if (!expr.trimRight().endsWith('=')) {
@@ -46,15 +68,25 @@ class CalcProvider implements CompletionItemProvider {
     }
     try {
       const { skip, result } = calculate(expr);
-      // this.highlightDisposable = languages.registerDocumentHighlightProvider([{
-      //   scheme: document.uri,
-      // }], new CalcDocumentHighlightProvider(Range.create(
-      //   position.line,
-      //   skipPos,
-      //   position.line,
-      //   position.character
-      // )));
+      const formulaRaw = expr.slice(skip);
+      const leftMatches = formulaRaw.match(/^\s+/);
+      const leftEmpty = leftMatches ? leftMatches[0].length : 0;
+      const rightMatches = formulaRaw.match(/[\s=]+$/);
+      const rightEmpty = rightMatches ? rightMatches[0].length : 0;
+
       const newText = expr.endsWith(' =') ? ' ' + result : result;
+
+      this.clearHighlight();
+
+      this.highlight(
+        Range.create(
+          position.line,
+          skip + leftEmpty,
+          position.line,
+          position.character - rightEmpty
+        )
+      );
+
       return [
         {
           label: result,
@@ -78,16 +110,18 @@ class CalcProvider implements CompletionItemProvider {
       return [];
     }
   }
-
-  // resolveCompletionItem(item: CompletionItem): CompletionItem {
-  //   this.highlightDisposable.dispose();
-  //   return item;
-  // }
 }
 
 export const activate = async (context: ExtensionContext) => {
   const { subscriptions } = context;
   const config = workspace.getConfiguration('calc');
+
+  if (config.get<boolean>('highlight', true)) {
+    workspace.nvim.command(
+      'highlight default CocCalcFormule cterm=reverse gui=reverse',
+      true
+    );
+  }
 
   const disposable = languages.registerCompletionItemProvider(
     'calc',
