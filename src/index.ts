@@ -118,7 +118,7 @@ export const activate = async (context: ExtensionContext) => {
 
   if (config.get<boolean>('highlight', true)) {
     workspace.nvim.command(
-      'highlight default CocCalcFormule cterm=reverse gui=reverse',
+      'highlight default link CocCalcFormule CocHighlightText',
       true
     );
   }
