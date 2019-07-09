@@ -2775,9 +2775,9 @@ parse5@4.0.0:
   integrity sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==
 
 parsimmon@^1.12.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/parsimmon/-/parsimmon-1.12.0.tgz#886a442fb30b5fc3c8e7c4994050f5cdcfe0ea90"
-  integrity sha512-uC/BjuSfb4jfaWajKCp1mVncXXq+V1twbcYChbTxN3GM7fn+8XoHwUdvUz+PTaFtDSCRQxU8+Rnh+iMhAkVwdw==
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/parsimmon/-/parsimmon-1.12.1.tgz#4c08eb645934e2955517f1cea7c3613be9a1f091"
+  integrity sha512-70VLg2g5CV8iBDYwxvREdR8qq56Y06K34+Dw8ENGvJWIsmOfs9ijB4IMPbYFVzOEhm2jRE/qTquq7GJ7tPnL7w==
 
 pascalcase@^0.1.1:
   version "0.1.1"
