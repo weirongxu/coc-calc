@@ -147,19 +147,18 @@ export class FuncCall extends Node {
 export class UnaryExpr extends Node {
   constructor(public operators: UnaryOptSyms[], public value: Node) {
     super();
-    this.registerResult(
-      () =>
-        this.operator === '+'
-          ? new DecimalLib(this.value.result)
-          : new DecimalLib(0).sub(this.value.result)
+    this.registerResult(() =>
+      this.operator === '+'
+        ? new DecimalLib(this.value.result)
+        : new DecimalLib(0).sub(this.value.result)
     );
   }
 
   get operator() {
-    return this.operators.reduce(
-      (ret, o) => ret * (o === '+' ? 1 : -1),
+    return this.operators.reduce((ret, o) => ret * (o === '+' ? 1 : -1), 1) ===
       1
-    ) === 1 ? '+' : '-';
+      ? '+'
+      : '-';
   }
 }
 
@@ -218,7 +217,7 @@ export const decimalP = P.regexp(
   .map(str => new Decimal(str))
   .desc('decimal');
 
-export const includesP = (ss: string[]) => P.alt(...ss.map(s => P.string(s)))
+export const includesP = (ss: string[]) => P.alt(...ss.map(s => P.string(s)));
 
 // export const constantP = P.regexp(/[A-Z_][A-Z_0-9]*/)
 export const constantP = includesP(ConstSyms)
@@ -226,8 +225,9 @@ export const constantP = includesP(ConstSyms)
   .desc('constant');
 
 // export const funcNameP = P.regexp(/[A-Z_a-z]\w*/).desc('functionName');
-export const funcNameP = includesP(Object.keys(FuncNameEnum))
-  .desc('functionName');
+export const funcNameP = includesP(Object.keys(FuncNameEnum)).desc(
+  'functionName'
+);
 
 export const funcCallP = P.lazy(() =>
   P.seq(
@@ -237,7 +237,7 @@ export const funcCallP = P.lazy(() =>
       rightParenthesisP
     )
   ).map(([name, args]) => new FuncCall(name, args))
-).desc('constant');
+).desc('functionCall');
 
 export const atomicP: P.Parser<Decimal | Constant> = optionalParenthesisP(
   P.alt(funcCallP, constantP, decimalP)
@@ -352,7 +352,9 @@ export const exprP: P.Parser<RootExpr> = P.alt(binaryOptExprP, unaryExprP)
   .trim(_)
   .desc('expression');
 
-export const skipEqualSignP = P.string('=').trim(_).times(0, 1)
+export const skipEqualSignP = P.string('=')
+  .trim(_)
+  .times(0, 1);
 
 export const mainP = exprP.skip(skipEqualSignP).desc('main');
 
@@ -363,40 +365,58 @@ export const printAst = (text: string) => {
   console.log(JSON.stringify(ast, null, 2));
 };
 
-export const calculate = (
-  text: string,
-  skip: number = 0,
-  skipRecords: number[] = [],
-  originText: string = text
-): {
+const skipEqual = (text: string) => {
+  const lastIndex = text.lastIndexOf('=');
+  return lastIndex === -1 ? 0 : lastIndex + 1;
+};
+
+const skipWord = (text: string) => {
+  const index = text.search(/\W/);
+  return index === -1 ? text.length : index + 1;
+};
+
+export interface CalculateResult {
   skip: number;
   result: string;
-} => {
+}
+
+const calculateRecursion = (
+  text: string,
+  skipped: number,
+  skippedRecords: number[] = [],
+  originText: string
+): CalculateResult => {
   try {
     const ast = parse(text);
     return {
-      skip,
+      skip: skipped,
       result: ast.result.valueOf()
     };
-  } catch (e) {
-    if (e.type === 'ParsimmonError') {
-      if (e.result.index.offset < 1) {
-        skipRecords.push(0);
-      }
-      const offset = Math.max(1, e.result.index.offset);
-      if (offset < text.length - 1) {
-        const newSkip = skip + offset;
-        return calculate(
-          text.slice(offset),
+  } catch (err) {
+    if (err.type === 'ParsimmonError') {
+      if (text.length > 0) {
+        const skip = skipWord(text);
+        const newSkip = skipped + skip;
+        return calculateRecursion(
+          text.slice(skip),
           newSkip,
-          [...skipRecords, newSkip],
-          originText,
+          [...skippedRecords, newSkip],
+          originText
         );
       }
     }
+
     const highlightSkipRecords = Array.from(Array(originText.length))
-      .map((_, index) => skipRecords.includes(index) ? '✗' : ' ')
+      .map((_, index) => (skippedRecords.includes(index) ? '✗' : ' '))
       .join('');
-    throw new Error(['CalculateError:', originText, highlightSkipRecords].join('\r\n'));
+    throw new Error(
+      ['CalculateError:', originText, highlightSkipRecords].join('\r\n')
+    );
   }
+};
+
+export const calculate = (text: string): CalculateResult => {
+  const textTrim = text.replace(/[=\s]*$/g, '');
+  const skip = skipEqual(textTrim);
+  return calculateRecursion(textTrim.slice(skip), skip, [], text);
 };

@@ -134,16 +134,24 @@ test('calc with function', () => {
 
 test('calc with invalid text', () => {
   expect(calculate('some text 1.321')).toEqual({
-    skip: 9,
+    skip: 10,
     result: '1.321'
   });
   expect(calculate('invalid text 1.321 = ')).toEqual({
-    skip: 12,
+    skip: 13,
     result: '1.321'
   });
   expect(calculate('invalid text\t1.321=')).toEqual({
-    skip: 12,
+    skip: 13,
     result: '1.321'
+  });
+  expect(calculate('1+2 invalid text 1.321=')).toEqual({
+    skip: 17,
+    result: '1.321'
+  });
+  expect(calculate('Math.floor(4.5 * 2 =')).toEqual({
+    skip: 11,
+    result: '9'
   });
   expect(calculate('Math.floor(seconds / 2 / 1 =')).toEqual({
     skip: 20,
@@ -154,7 +162,7 @@ test('calc with invalid text', () => {
     result: '2'
   });
   expect(calculate('1 + 1 = 2 + 3 = 5 + 5 =')).toEqual({
-    skip: 16,
+    skip: 15,
     result: '10'
   });
 });
