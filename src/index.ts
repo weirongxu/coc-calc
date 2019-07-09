@@ -22,17 +22,8 @@ class CalcProvider implements CompletionItemProvider {
   constructor(public isDebug: boolean) {
     this.srdId = workspace.createNameSpace('coc-calc');
 
-    workspace.registerKeymap(['i'], '<ESC>', () => {
-      this.clearHighlight();
-    });
     workspace.registerAutocmd({
-      event: 'CursorMoved',
-      callback: () => {
-        this.clearHighlight();
-      }
-    });
-    workspace.registerAutocmd({
-      event: 'CursorMovedI',
+      event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
         this.clearHighlight();
       }
