@@ -18,6 +18,7 @@ import { calculate } from './calc-parser';
 class CalcProvider implements CompletionItemProvider {
   private srdId: number;
   private matchIds: Set<number> = new Set();
+  private replacePosition?: Range;
 
   constructor(public isDebug: boolean) {
     this.srdId = workspace.createNameSpace('coc-calc');
@@ -78,6 +79,13 @@ class CalcProvider implements CompletionItemProvider {
         )
       );
 
+      this.replacePosition = Range.create(
+        position.line,
+        skip + leftEmpty,
+        position.line,
+        position.character - rightEmpty + newText.length
+      )
+
       return [
         {
           label: result,
@@ -100,6 +108,14 @@ class CalcProvider implements CompletionItemProvider {
       }
       return [];
     }
+  }
+
+  async resolveCompletionItem(item: CompletionItem, token: CancellationToken): Promise<CompletionItem> {
+    item.textEdit = {
+      range: this.replacePosition!,
+      newText: item.textEdit!.newText.trim(),
+    }
+    return item;
   }
 }
 
