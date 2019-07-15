@@ -83,7 +83,7 @@ class CalcProvider implements CompletionItemProvider {
         position.line,
         skip + leftEmpty,
         position.line,
-        position.character - rightEmpty + newText.length
+        position.character + newText.length
       )
 
       return [
