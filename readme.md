@@ -27,7 +27,7 @@ Calculate extension for coc.nvim
 
 ## Configurations
 
-* `calc.priority`, calc priority, default: `99`
+* `calc.priority`, calc priority, default: `1000`
 * `calc.highlight`, enable calc highlight, default: `true`
 
 ## Operators

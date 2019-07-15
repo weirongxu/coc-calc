@@ -34,7 +34,7 @@
         },
         "calc.priority": {
           "type": "integer",
-          "default": 99,
+          "default": 1000,
           "description": "Calc priority"
         },
         "calc.highlight": {

@@ -120,7 +120,7 @@ export const activate = async (context: ExtensionContext) => {
     null,
     new CalcProvider(config.get<boolean>('debug', false)),
     ['=', ' '],
-    config.get<number>('priority', 99)
+    config.get<number>('priority', 1000)
   );
   subscriptions.push(disposable);
 };
