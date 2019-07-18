@@ -32,6 +32,11 @@
           "type": "boolean",
           "default": false
         },
+        "calc.replaceOriginalExpression": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable relace original expression"
+        },
         "calc.priority": {
           "type": "integer",
           "default": 1000,

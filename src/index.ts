@@ -3,7 +3,8 @@ import {
   languages,
   ExtensionContext,
   CompletionItemProvider,
-  CompletionContext
+  CompletionContext,
+  WorkspaceConfiguration
 } from 'coc.nvim';
 import {
   TextDocument,
@@ -19,9 +20,13 @@ class CalcProvider implements CompletionItemProvider {
   private srdId: number;
   private matchIds: Set<number> = new Set();
   private replacePosition?: Range;
+  private enableDebug: boolean;
+  private enableReplaceOriginalExpression: boolean;
 
-  constructor(public isDebug: boolean) {
+  constructor(public config: WorkspaceConfiguration) {
     this.srdId = workspace.createNameSpace('coc-calc');
+    this.enableDebug = this.config.get<boolean>('debug', false);
+    this.enableReplaceOriginalExpression = this.config.get<boolean>('replaceOriginalExpression', true);
 
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
@@ -84,7 +89,7 @@ class CalcProvider implements CompletionItemProvider {
         skip + leftEmpty,
         position.line,
         position.character + newText.length
-      )
+      );
 
       return [
         {
@@ -103,17 +108,22 @@ class CalcProvider implements CompletionItemProvider {
         } as CompletionItem
       ];
     } catch (error) {
-      if (this.isDebug) {
+      if (this.enableDebug) {
         workspace.showMessage(error.message, 'error');
       }
       return [];
     }
   }
 
-  async resolveCompletionItem(item: CompletionItem, token: CancellationToken): Promise<CompletionItem> {
-    item.textEdit = {
-      range: this.replacePosition!,
-      newText: item.textEdit!.newText.trim(),
+  async resolveCompletionItem(
+    item: CompletionItem,
+    _token: CancellationToken
+  ): Promise<CompletionItem> {
+    if (this.enableReplaceOriginalExpression) {
+      item.textEdit = {
+        range: this.replacePosition!,
+        newText: item.textEdit!.newText.trim()
+      };
     }
     return item;
   }
@@ -134,7 +144,7 @@ export const activate = async (context: ExtensionContext) => {
     'calc',
     'CALC',
     null,
-    new CalcProvider(config.get<boolean>('debug', false)),
+    new CalcProvider(config),
     ['=', ' '],
     config.get<number>('priority', 1000)
   );
