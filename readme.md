@@ -25,6 +25,17 @@ Calculate extension for coc.nvim
     sin(PI / 2) =
     ```
 
+## Keymaps
+Create keymappings like:
+
+```vim
+" append result on current expression
+nmap <Leader>ca <Plug>(coc-calc-result-append)
+" replace result on current expression
+nmap <Leader>cr <Plug>(coc-calc-result-replace)
+```
+
+
 ## Configurations
 
 * `calc.priority`, calc priority, default: `1000`

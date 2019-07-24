@@ -161,6 +161,10 @@ test('calc with invalid text', () => {
     skip: 2,
     result: '2'
   });
+  expect(calculate('1 + 1 5 + 5 =')).toEqual({
+    skip: 6,
+    result: '10'
+  });
   expect(calculate('1 + 1 = 2 + 3 = 5 + 5 =')).toEqual({
     skip: 15,
     result: '10'
