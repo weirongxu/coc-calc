@@ -3,18 +3,18 @@ import { Position, TextEdit } from 'vscode-languageserver-protocol';
 import { CalcProvider } from './calc-provider';
 
 export const activate = async (context: ExtensionContext) => {
-  const { subscriptions } = context;
+  const { subscriptions, logger } = context;
   const config = workspace.getConfiguration('calc');
   const { nvim } = workspace;
 
   if (config.get<boolean>('highlight', true)) {
     nvim.command(
       'highlight default link CocCalcFormule CocHighlightText',
-      true
+      true,
     );
   }
 
-  const calcProvider = new CalcProvider(config);
+  const calcProvider = new CalcProvider(config, logger);
 
   subscriptions.push(
     languages.registerCompletionItemProvider(
@@ -23,17 +23,17 @@ export const activate = async (context: ExtensionContext) => {
       null,
       calcProvider,
       ['=', ' '],
-      config.get<number>('priority', 1000)
-    )
+      config.get<number>('priority', 1000),
+    ),
   );
 
   subscriptions.push(
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        calcProvider.clearHighlight();
-      }
-    })
+        calcProvider.clearHighlight().catch(logger.error);
+      },
+    }),
   );
 
   // subscriptions.push(
@@ -62,39 +62,39 @@ export const activate = async (context: ExtensionContext) => {
     const {
       newText,
       expressionWithEqualSignRange,
-      expressionEndRange
+      expressionEndRange,
     } = calcProvider.calculateLine(
       Position.create(position.line, character),
-      exprLine
+      exprLine,
     );
     if (mode === 'append') {
       const endWithEqual = exprLine.trimRight().endsWith('=');
-      doc.applyEdits(nvim, [
-        TextEdit.replace(
-          expressionEndRange,
-          endWithEqual ? newText : ' = ' + newText
-        )
-      ]);
+      doc
+        .applyEdits(nvim, [
+          TextEdit.replace(
+            expressionEndRange,
+            endWithEqual ? newText : ' = ' + newText,
+          ),
+        ])
+        .catch(logger.error);
     } else if (mode === 'replace') {
-      doc.applyEdits(nvim, [
-        TextEdit.replace(expressionWithEqualSignRange, newText)
-      ]);
+      doc
+        .applyEdits(nvim, [
+          TextEdit.replace(expressionWithEqualSignRange, newText),
+        ])
+        .catch(logger.error);
     }
   }
 
   subscriptions.push(
     workspace.registerKeymap(['n', 'i'], 'calc-result-append', async () => {
-      replaceResult('append');
-    })
+      await replaceResult('append');
+    }),
   );
 
   subscriptions.push(
-    workspace.registerKeymap(
-      ['n', 'i'],
-      'calc-result-replace',
-      async () => {
-        replaceResult('replace');
-      }
-    )
+    workspace.registerKeymap(['n', 'i'], 'calc-result-replace', async () => {
+      await replaceResult('replace');
+    }),
   );
 };

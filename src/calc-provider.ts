@@ -2,7 +2,7 @@ import {
   workspace,
   CompletionItemProvider,
   CompletionContext,
-  WorkspaceConfiguration
+  WorkspaceConfiguration,
 } from 'coc.nvim';
 import { calculate } from './calc-parser';
 import {
@@ -11,7 +11,8 @@ import {
   CompletionItemKind,
   Range,
   Position,
-  CancellationToken
+  CancellationToken,
+  Logger,
 } from 'vscode-languageserver-protocol';
 
 export class CalcProvider implements CompletionItemProvider {
@@ -23,20 +24,20 @@ export class CalcProvider implements CompletionItemProvider {
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
 
-  constructor(public config: WorkspaceConfiguration) {
+  constructor(public config: WorkspaceConfiguration, private logger: Logger) {
     this.srdId = workspace.createNameSpace('coc-calc');
     this.enableActive = false;
     this.enableDebug = this.config.get<boolean>('debug', false);
     this.enableReplaceOriginalExpression = this.config.get<boolean>(
       'replaceOriginalExpression',
-      true
+      true,
     );
 
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        this.clearHighlight();
-      }
+        this.clearHighlight().catch(logger.error);
+      },
     });
   }
 
@@ -45,9 +46,9 @@ export class CalcProvider implements CompletionItemProvider {
     const matchIds = document.highlightRanges(
       [range],
       'CocCalcFormule',
-      this.srdId
+      this.srdId,
     );
-    matchIds.forEach(id => this.matchIds.add(id));
+    matchIds.forEach((id) => this.matchIds.add(id));
   }
 
   public async clearHighlight() {
@@ -57,7 +58,7 @@ export class CalcProvider implements CompletionItemProvider {
 
   public calculateLine(
     position: Position,
-    exprLine: string
+    exprLine: string,
   ): {
     skip: number;
     result: string;
@@ -83,20 +84,20 @@ export class CalcProvider implements CompletionItemProvider {
         position.line,
         skip + leftEmpty,
         position.line,
-        position.character - rightEmpty
+        position.character - rightEmpty,
       ),
       expressionWithEqualSignRange: Range.create(
         position.line,
         skip + leftEmpty,
         position.line,
-        position.character
+        position.character,
       ),
       expressionEndRange: Range.create(
         position.line,
         position.character,
         position.line,
-        position.character
-      )
+        position.character,
+      ),
     };
   }
 
@@ -104,10 +105,10 @@ export class CalcProvider implements CompletionItemProvider {
     document: TextDocument,
     position: Position,
     _token: CancellationToken,
-    _context: CompletionContext
+    _context: CompletionContext,
   ): Promise<CompletionItem[]> {
     const exprLine = document.getText(
-      Range.create(Position.create(position.line, 0), position)
+      Range.create(Position.create(position.line, 0), position),
     );
     if (!this.enableActive && !exprLine.trimRight().endsWith('=')) {
       return [];
@@ -119,12 +120,12 @@ export class CalcProvider implements CompletionItemProvider {
         expressionRange,
         expressionWithEqualSignRange,
         expressionEndRange,
-        newText
+        newText,
       } = this.calculateLine(position, exprLine);
 
-      this.clearHighlight();
+      this.clearHighlight().catch(logger.error);
 
-      this.highlight(expressionRange);
+      this.highlight(expressionRange).catch(logger.error);
 
       this.replacePosition = expressionWithEqualSignRange;
 
@@ -135,9 +136,9 @@ export class CalcProvider implements CompletionItemProvider {
           documentation: '`' + exprLine.slice(skip).trimLeft() + newText + '`',
           textEdit: {
             range: expressionEndRange,
-            newText
-          }
-        } as CompletionItem
+            newText,
+          },
+        } as CompletionItem,
       ];
     } catch (error) {
       if (this.enableDebug) {
@@ -149,12 +150,12 @@ export class CalcProvider implements CompletionItemProvider {
 
   async resolveCompletionItem(
     item: CompletionItem,
-    _token: CancellationToken
+    _token: CancellationToken,
   ): Promise<CompletionItem> {
     if (this.enableReplaceOriginalExpression) {
       item.textEdit = {
         range: this.replacePosition!,
-        newText: item.textEdit!.newText.trim()
+        newText: item.textEdit!.newText.trim(),
       };
     }
     return item;

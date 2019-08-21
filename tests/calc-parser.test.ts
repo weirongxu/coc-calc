@@ -21,7 +21,7 @@ const calValue = (s: string) => {
 test('parse decimal', () => {
   expect(tryParseValue(decimalP, '1')).toEqual('1');
   expect(tryParseValue(decimalP, '3.141592653589793')).toEqual(
-    '3.141592653589793'
+    '3.141592653589793',
   );
   expect(tryParseValue(decimalP, '1.2e5')).toEqual('120000');
   expect(tryParseValue(decimalP, '1.2e+5')).toEqual('120000');
@@ -42,7 +42,7 @@ test('parse unaryExpression', () => {
   expect(tryParseValue(unaryExprP, '--1')).toEqual('1');
   expect(tryParseValue(unaryExprP, '---1')).toEqual('-1');
   expect(tryParseValue(unaryExprP, '+3.141592653589793')).toEqual(
-    '3.141592653589793'
+    '3.141592653589793',
   );
   expect(tryParseValue(unaryExprP, '-1.2e5')).toEqual('-120000');
   expect(tryParseValue(unaryExprP, '-1.2e+5')).toEqual('-120000');
@@ -135,38 +135,38 @@ test('calc with function', () => {
 test('calc with invalid text', () => {
   expect(calculate('some text 1.321')).toEqual({
     skip: 10,
-    result: '1.321'
+    result: '1.321',
   });
   expect(calculate('invalid text 1.321 = ')).toEqual({
     skip: 13,
-    result: '1.321'
+    result: '1.321',
   });
   expect(calculate('invalid text\t1.321=')).toEqual({
     skip: 13,
-    result: '1.321'
+    result: '1.321',
   });
   expect(calculate('1+2 invalid text 1.321=')).toEqual({
     skip: 17,
-    result: '1.321'
+    result: '1.321',
   });
   expect(calculate('Math.floor(4.5 * 2 =')).toEqual({
     skip: 11,
-    result: '9'
+    result: '9',
   });
   expect(calculate('Math.floor(seconds / 2 / 1 =')).toEqual({
     skip: 20,
-    result: '2'
+    result: '2',
   });
   expect(calculate('E 1 + 1 =')).toEqual({
     skip: 2,
-    result: '2'
+    result: '2',
   });
   expect(calculate('1 + 1 5 + 5 =')).toEqual({
     skip: 6,
-    result: '10'
+    result: '10',
   });
   expect(calculate('1 + 1 = 2 + 3 = 5 + 5 =')).toEqual({
     skip: 15,
-    result: '10'
+    result: '10',
   });
 });

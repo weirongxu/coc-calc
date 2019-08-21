@@ -1,0 +1,14 @@
+{
+  "rulesDirectory": ["src"],
+  "linterOptions": {
+    "exclude": [
+      "src/generated/**"
+    ]
+  },
+  "rules": {
+    "semicolon": true,
+    "trailing-comma": [true, "all"],
+    "quotemark": [true, "single"],
+    "no-floating-promises": true
+  }
+}

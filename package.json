@@ -12,7 +12,7 @@
     "clean": "rm -rf lib",
     "build": "tsc",
     "prepare": "yarn run clean && yarn run build",
-    "test": "jest"
+    "test": "tslint -p . && jest"
   },
   "files": [
     "lib"
@@ -59,13 +59,13 @@
     "url": "https://github.com/weirongxu/coc-calc.git"
   },
   "devDependencies": {
-    "@chemzqm/tslint-config": "^1.0.18",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.2",
     "@types/parsimmon": "^1.10.0",
     "coc.nvim": "^0.0.72",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
+    "tslint": "^5.19.0",
     "typescript": "^3.5.3"
   },
   "dependencies": {

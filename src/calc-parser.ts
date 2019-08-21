@@ -17,7 +17,7 @@ export type BinaryOptSyms =
 export const BinaryOptSyms = [
   ...BinaryExponentOptSyms,
   ...BinaryMulOptSyms,
-  ...BinaryAddOptSyms
+  ...BinaryAddOptSyms,
 ];
 
 export class BinaryExponentOptClass {
@@ -43,7 +43,7 @@ export const ConstSyms: ConstSyms[] = [
   'LOG10E',
   'PI',
   'SQRT1_2',
-  'SQRT2'
+  'SQRT2',
 ];
 
 export class FuncNameClass {
@@ -102,7 +102,7 @@ export abstract class Node {
   registerResult(callback: () => DecimalLib) {
     Object.defineProperty(this, 'result', {
       get: callback,
-      enumerable: true
+      enumerable: true,
     });
   }
 }
@@ -139,7 +139,7 @@ export class FuncCall extends Node {
     this.funcNameSym = this.rawFuncName as FuncNameSyms;
     this.registerResult(() => {
       // @ts-ignore
-      return DecimalLib[this.funcNameSym](...args.map(a => a.result));
+      return DecimalLib[this.funcNameSym](...args.map((a) => a.result));
     });
   }
 }
@@ -150,7 +150,7 @@ export class UnaryExpr extends Node {
     this.registerResult(() =>
       this.operator === '+'
         ? new DecimalLib(this.value.result)
-        : new DecimalLib(0).sub(this.value.result)
+        : new DecimalLib(0).sub(this.value.result),
     );
   }
 
@@ -172,14 +172,14 @@ export class BinaryExpr extends Node {
       '*': () => l.mul(r),
       '/': () => l.div(r),
       '%': () => l.modulo(r),
-      '**': () => l.pow(r)
+      '**': () => l.pow(r),
     }[expr.operator.raw]();
   }
 
   constructor(
     public left: Node,
     public operator: BinaryOpt,
-    public right: Node
+    public right: Node,
   ) {
     super();
     this.registerResult(() => BinaryExpr.calculate(this));
@@ -197,36 +197,36 @@ export const rightParenthesisP = P.string(')').trim(_);
 
 export const ofStringArrayP = <T extends string = string>(
   ...strs: string[]
-): P.Parser<T> => P.alt(...strs.map(s => P.string(s))) as P.Parser<T>;
+): P.Parser<T> => P.alt(...strs.map((s) => P.string(s))) as P.Parser<T>;
 
 export const optionalParenthesisP = <T extends any>(
-  parser: P.Parser<T>
+  parser: P.Parser<T>,
 ): P.Parser<T> => {
   return P.alt(
     parser,
     parser.wrap(leftParenthesisP, rightParenthesisP),
     P.lazy(() =>
-      optionalParenthesisP(parser).wrap(leftParenthesisP, rightParenthesisP)
-    )
+      optionalParenthesisP(parser).wrap(leftParenthesisP, rightParenthesisP),
+    ),
   );
 };
 
 export const decimalP = P.regexp(
-  /(\d+(\.\d+)?|(\.\d+))(e[-+]?\d+)?(p[-+]?\d+)?/
+  /(\d+(\.\d+)?|(\.\d+))(e[-+]?\d+)?(p[-+]?\d+)?/,
 )
-  .map(str => new Decimal(str))
+  .map((str) => new Decimal(str))
   .desc('decimal');
 
-export const includesP = (ss: string[]) => P.alt(...ss.map(s => P.string(s)));
+export const includesP = (ss: string[]) => P.alt(...ss.map((s) => P.string(s)));
 
 // export const constantP = P.regexp(/[A-Z_][A-Z_0-9]*/)
 export const constantP = includesP(ConstSyms)
-  .map(str => new Constant(str))
+  .map((str) => new Constant(str))
   .desc('constant');
 
 // export const funcNameP = P.regexp(/[A-Z_a-z]\w*/).desc('functionName');
 export const funcNameP = includesP(Object.keys(FuncNameEnum)).desc(
-  'functionName'
+  'functionName',
 );
 
 export const funcCallP = P.lazy(() =>
@@ -234,13 +234,13 @@ export const funcCallP = P.lazy(() =>
     funcNameP,
     P.sepBy(exprP, P.string(',').trim(_)).wrap(
       leftParenthesisP,
-      rightParenthesisP
-    )
-  ).map(([name, args]) => new FuncCall(name, args))
+      rightParenthesisP,
+    ),
+  ).map(([name, args]) => new FuncCall(name, args)),
 ).desc('functionCall');
 
 export const atomicP: P.Parser<Decimal | Constant> = optionalParenthesisP(
-  P.alt(funcCallP, constantP, decimalP)
+  P.alt(funcCallP, constantP, decimalP),
 ).desc('atomic');
 
 export const unaryOptP = ofStringArrayP<UnaryOptSyms>(...UnaryOptSyms)
@@ -251,16 +251,16 @@ export const unaryExprP: P.Parser<UnaryExpr | Decimal | Constant> = P.lazy(() =>
   optionalParenthesisP(
     P.alt(
       P.seq(unaryOptP.many(), atomicP).map(
-        ([unaryOperators, decimal]) => new UnaryExpr(unaryOperators, decimal)
+        ([unaryOperators, decimal]) => new UnaryExpr(unaryOperators, decimal),
       ),
-      atomicP
-    )
-  )
+      atomicP,
+    ),
+  ),
 ).desc('unaryExpression');
 
 export const binaryOptP = ofStringArrayP<BinaryOptSyms>(...BinaryOptSyms)
   .trim(_)
-  .map(str => new BinaryOpt(str))
+  .map((str) => new BinaryOpt(str))
   .desc('binaryOperator');
 
 export const binaryCalculate = <N extends Node>(
@@ -325,23 +325,23 @@ export const binaryOptExprP: P.Parser<BinaryExpr | UnaryExpr> = P.lazy(() => {
   const unaryP = <T extends Node>(parser: P.Parser<T>) => {
     return P.alt(
       P.seq(unaryOptP.many(), parser).map(
-        ([unaryOpts, expr]) => new UnaryExpr(unaryOpts, expr)
+        ([unaryOpts, expr]) => new UnaryExpr(unaryOpts, expr),
       ),
-      parser
+      parser,
     );
   };
   const exprP = optionalParenthesisP(
     P.seqMap(
       P.alt(
         unaryP(binaryOptExprP.wrap(leftParenthesisP, rightParenthesisP)),
-        unaryExprP
+        unaryExprP,
       ) as P.Parser<Node>,
       P.seq(binaryOptP, P.alt(
         unaryP(binaryOptExprP.wrap(leftParenthesisP, rightParenthesisP)),
-        unaryExprP
+        unaryExprP,
       ) as P.Parser<Node>).atLeast(1),
-      (left, [...rest]) => binaryCalculate(left, ...rest)
-    )
+      (left, [...rest]) => binaryCalculate(left, ...rest),
+    ),
   );
   return unaryP(exprP);
 });
@@ -384,13 +384,13 @@ const calculateRecursion = (
   text: string,
   skipped: number,
   skippedRecords: number[] = [],
-  originText: string
+  originText: string,
 ): CalculateResult => {
   try {
     const ast = parse(text);
     return {
       skip: skipped,
-      result: ast.result.valueOf()
+      result: ast.result.valueOf(),
     };
   } catch (err) {
     if (err.type === 'ParsimmonError') {
@@ -401,7 +401,7 @@ const calculateRecursion = (
           text.slice(skip),
           newSkip,
           [...skippedRecords, newSkip],
-          originText
+          originText,
         );
       }
     }
@@ -410,7 +410,7 @@ const calculateRecursion = (
       .map((_, index) => (skippedRecords.includes(index) ? '✗' : ' '))
       .join('');
     throw new Error(
-      ['CalculateError:', originText, highlightSkipRecords].join('\r\n')
+      ['CalculateError:', originText, highlightSkipRecords].join('\r\n'),
     );
   }
 };
