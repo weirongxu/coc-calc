@@ -107,7 +107,6 @@ export class CalcProvider implements CompletionItemProvider {
     _token: CancellationToken,
     _context: CompletionContext,
   ): Promise<CompletionItem[]> {
-    workspace.showMessage('test');
     const exprLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
     );
