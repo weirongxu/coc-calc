@@ -36,7 +36,7 @@ export class CalcProvider implements CompletionItemProvider {
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        this.clearHighlight().catch(logger.error);
+        this.clearHighlight().catch(this.logger.error);
       },
     });
   }
@@ -107,6 +107,7 @@ export class CalcProvider implements CompletionItemProvider {
     _token: CancellationToken,
     _context: CompletionContext,
   ): Promise<CompletionItem[]> {
+    workspace.showMessage('test');
     const exprLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
     );
@@ -123,9 +124,9 @@ export class CalcProvider implements CompletionItemProvider {
         newText,
       } = this.calculateLine(position, exprLine);
 
-      this.clearHighlight().catch(logger.error);
+      this.clearHighlight().catch(this.logger.error);
 
-      this.highlight(expressionRange).catch(logger.error);
+      this.highlight(expressionRange).catch(this.logger.error);
 
       this.replacePosition = expressionWithEqualSignRange;
 
