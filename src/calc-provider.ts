@@ -12,7 +12,6 @@ import {
   Range,
   Position,
   CancellationToken,
-  Logger,
 } from 'vscode-languageserver-protocol';
 
 export class CalcProvider implements CompletionItemProvider {
@@ -24,7 +23,7 @@ export class CalcProvider implements CompletionItemProvider {
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
 
-  constructor(public config: WorkspaceConfiguration, private logger: Logger) {
+  constructor(public config: WorkspaceConfiguration, private onError: (error: Error) => any) {
     this.srcId = workspace.createNameSpace('coc-calc');
     this.enableActive = false;
     this.enableDebug = this.config.get<boolean>('debug', false);
@@ -36,7 +35,7 @@ export class CalcProvider implements CompletionItemProvider {
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        this.clearHighlight().catch(this.logger.error);
+        this.clearHighlight().catch(this.onError);
       },
     });
   }
@@ -123,9 +122,9 @@ export class CalcProvider implements CompletionItemProvider {
         newText,
       } = this.calculateLine(position, exprLine);
 
-      this.clearHighlight().catch(this.logger.error);
+      this.clearHighlight().catch(this.onError);
 
-      this.highlight(expressionRange).catch(this.logger.error);
+      this.highlight(expressionRange).catch(this.onError);
 
       this.replacePosition = expressionWithEqualSignRange;
 

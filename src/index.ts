@@ -14,7 +14,9 @@ export const activate = async (context: ExtensionContext) => {
     );
   }
 
-  const calcProvider = new CalcProvider(config, logger);
+  const onError = logger.error.bind(logger);
+
+  const calcProvider = new CalcProvider(config, onError);
 
   subscriptions.push(
     languages.registerCompletionItemProvider(
@@ -25,32 +27,23 @@ export const activate = async (context: ExtensionContext) => {
       ['=', ' '],
       config.get<number>('priority', 1000),
     ),
-  );
-
-  subscriptions.push(
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        calcProvider.clearHighlight().catch(logger.error);
+        calcProvider.clearHighlight().catch(onError);
       },
     }),
+    // workspace.registerAutocmd({
+    //   event: ['InsertLeave'],
+    //   callback: () => {
+    //     calcProvider.enableActive = false;
+    //   }
+    // }),
+    // workspace.registerKeymap(['n'], 'calc-active-mode-i', async () => {
+    //   await nvim.feedKeys('i', 'n', false);
+    //   calcProvider.enableActive = true;
+    // }),
   );
-
-  // subscriptions.push(
-  //   workspace.registerAutocmd({
-  //     event: ['InsertLeave'],
-  //     callback: () => {
-  //       calcProvider.enableActive = false;
-  //     }
-  //   })
-  // );
-  //
-  // subscriptions.push(
-  //   workspace.registerKeymap(['n'], 'calc-active-mode-i', async () => {
-  //     await nvim.feedKeys('i', 'n', false);
-  //     calcProvider.enableActive = true;
-  //   })
-  // );
 
   async function replaceResult(mode: 'append' | 'replace') {
     const doc = await workspace.document;
@@ -76,13 +69,13 @@ export const activate = async (context: ExtensionContext) => {
             endWithEqual ? newText : ' = ' + newText,
           ),
         ])
-        .catch(logger.error);
+        .catch(onError);
     } else if (mode === 'replace') {
       doc
         .applyEdits(nvim, [
           TextEdit.replace(expressionWithEqualSignRange, newText),
         ])
-        .catch(logger.error);
+        .catch(onError);
     }
   }
 
@@ -90,9 +83,6 @@ export const activate = async (context: ExtensionContext) => {
     workspace.registerKeymap(['n', 'i'], 'calc-result-append', async () => {
       await replaceResult('append');
     }),
-  );
-
-  subscriptions.push(
     workspace.registerKeymap(['n', 'i'], 'calc-result-replace', async () => {
       await replaceResult('replace');
     }),
