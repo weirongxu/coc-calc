@@ -54,10 +54,7 @@
   "author": "weirongxu.raidou@gmail.com",
   "publisher": "weirongxu",
   "homepage": "https://github.com/weirongxu/coc-calc",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/weirongxu/coc-calc.git"
-  },
+  "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.2",

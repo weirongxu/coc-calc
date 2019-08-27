@@ -18,14 +18,14 @@ import {
 export class CalcProvider implements CompletionItemProvider {
   public enableActive: boolean;
 
-  private srdId: number;
+  private srcId: number;
   private matchIds: Set<number> = new Set();
   private replacePosition?: Range;
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
 
   constructor(public config: WorkspaceConfiguration, private logger: Logger) {
-    this.srdId = workspace.createNameSpace('coc-calc');
+    this.srcId = workspace.createNameSpace('coc-calc');
     this.enableActive = false;
     this.enableDebug = this.config.get<boolean>('debug', false);
     this.enableReplaceOriginalExpression = this.config.get<boolean>(
@@ -46,7 +46,7 @@ export class CalcProvider implements CompletionItemProvider {
     const matchIds = document.highlightRanges(
       [range],
       'CocCalcFormule',
-      this.srdId,
+      this.srcId,
     );
     matchIds.forEach((id) => this.matchIds.add(id));
   }
