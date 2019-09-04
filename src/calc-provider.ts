@@ -31,13 +31,6 @@ export class CalcProvider implements CompletionItemProvider {
       'replaceOriginalExpression',
       true,
     );
-
-    workspace.registerAutocmd({
-      event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
-      callback: () => {
-        this.clearHighlight().catch(this.onError);
-      },
-    });
   }
 
   public async highlight(range: Range) {
