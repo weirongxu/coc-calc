@@ -4,7 +4,7 @@ import {
   CompletionContext,
   WorkspaceConfiguration,
 } from 'coc.nvim';
-import { calculate } from './calc-parser';
+import { calculate } from 'editor-calc';
 import {
   TextDocument,
   CompletionItem,
@@ -31,13 +31,6 @@ export class CalcProvider implements CompletionItemProvider {
       'replaceOriginalExpression',
       true,
     );
-
-    workspace.registerAutocmd({
-      event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
-      callback: () => {
-        this.clearHighlight().catch(this.onError);
-      },
-    });
   }
 
   public async highlight(range: Range) {
