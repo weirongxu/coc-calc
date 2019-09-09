@@ -58,7 +58,6 @@
   "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
     "@types/node": "^12.6.2",
-    "@types/parsimmon": "^1.10.0",
     "coc.nvim": "^0.0.72",
     "editor-calc": "^1.0.0",
     "ts-loader": "^6.0.4",
