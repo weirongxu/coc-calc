@@ -4,7 +4,7 @@ import {
   CompletionContext,
   WorkspaceConfiguration,
 } from 'coc.nvim';
-import { calculate } from './calc-parser';
+import { calculate } from 'editor-calc';
 import {
   TextDocument,
   CompletionItem,

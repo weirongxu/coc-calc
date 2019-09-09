@@ -10,9 +10,10 @@
   ],
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "tsc",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
     "prepare": "yarn run clean && yarn run build",
-    "test": "tslint -p . && jest"
+    "test": "tslint -p ."
   },
   "files": [
     "lib"
@@ -56,18 +57,16 @@
   "homepage": "https://github.com/weirongxu/coc-calc",
   "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
-    "@types/jest": "^24.0.15",
     "@types/node": "^12.6.2",
     "@types/parsimmon": "^1.10.0",
     "coc.nvim": "^0.0.72",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
+    "editor-calc": "^1.0.0",
+    "ts-loader": "^6.0.4",
     "tslint": "^5.19.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "vscode-languageserver-protocol": "^3.14.1",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.8"
   },
-  "dependencies": {
-    "decimal.js": "^10.2.0",
-    "parsimmon": "^1.12.1",
-    "vscode-languageserver-protocol": "^3.14.1"
-  }
+  "dependencies": {}
 }
