@@ -23,7 +23,10 @@ export class CalcProvider implements CompletionItemProvider {
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
 
-  constructor(public config: WorkspaceConfiguration, private onError: (error: Error) => any) {
+  constructor(
+    public config: WorkspaceConfiguration,
+    private onError: (error: Error) => any,
+  ) {
     this.srcId = workspace.createNameSpace('coc-calc');
     this.enableActive = false;
     this.enableDebug = this.config.get<boolean>('debug', false);
@@ -134,6 +137,7 @@ export class CalcProvider implements CompletionItemProvider {
       ];
     } catch (error) {
       if (this.enableDebug) {
+        // tslint:disable-next-line: ban
         workspace.showMessage(error.message, 'error');
       }
       return [];

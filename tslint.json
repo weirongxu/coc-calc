@@ -4,6 +4,10 @@
     "semicolon": true,
     "trailing-comma": [true, "all"],
     "quotemark": [true, "single"],
-    "no-floating-promises": true
+    "no-floating-promises": true,
+    "ban": [
+      true,
+      ["workspace", "showMessage"]
+    ]
   }
 }
