@@ -9,10 +9,7 @@ Calculate extension for coc.nvim
 * Support bignumber, use [decimal.js](https://github.com/MikeMcl/decimal.js)
 * Suppoort [Mathematics functions](http://mikemcl.github.io/decimal.js/#methods)
 
-## Screenshot
-
-![screenshot](https://user-images.githubusercontent.com/1709861/60494409-55a59380-9ce1-11e9-9f7e-769588f8e756.png)
-![screenshot](https://user-images.githubusercontent.com/1709861/60494462-740b8f00-9ce1-11e9-8d21-ca241bbc4d68.png)
+![screenshot](https://user-images.githubusercontent.com/1709861/65944119-9ab59f00-e463-11e9-886f-11513a8e01c9.gif)
 
 ## Usage
 
