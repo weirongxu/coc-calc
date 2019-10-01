@@ -111,7 +111,6 @@ export class CalcProvider implements CompletionItemProvider {
     try {
       const {
         skip,
-        result,
         expressionRange,
         expressionWithEqualSignRange,
         expressionEndRange,
@@ -126,7 +125,7 @@ export class CalcProvider implements CompletionItemProvider {
 
       return [
         {
-          label: result,
+          label: newText,
           kind: CompletionItemKind.Constant,
           documentation: '`' + exprLine.slice(skip).trimLeft() + newText + '`',
           textEdit: {
