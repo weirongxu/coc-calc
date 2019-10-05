@@ -57,15 +57,15 @@
   "homepage": "https://github.com/weirongxu/coc-calc",
   "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
-    "@types/node": "^12.6.2",
-    "coc.nvim": "^0.0.72",
-    "editor-calc": "^1.0.0",
-    "ts-loader": "^6.0.4",
-    "tslint": "^5.19.0",
-    "typescript": "^3.5.3",
+    "@types/node": "^12.7.11",
+    "coc.nvim": "^0.0.73",
+    "editor-calc": "^1.1.0",
+    "ts-loader": "^6.2.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3",
     "vscode-languageserver-protocol": "^3.14.1",
-    "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.8"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {}
 }

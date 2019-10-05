@@ -12,6 +12,7 @@
 
 ## Features
 
+- Support underscores in numbers `10_000_000`
 - Support bignumber, use [decimal.js](https://github.com/MikeMcl/decimal.js)
 - Suppoort [Mathematics functions](http://mikemcl.github.io/decimal.js/#methods)
 
