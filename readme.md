@@ -46,9 +46,9 @@ nmap <Leader>cr <Plug>(coc-calc-result-replace)
 - `calc.highlight`, enable calc highlight, default: `true`
 - `calc.replaceOriginalExpression`, enable relace original expression, default: `true`
 
-## API
+## Vim API
 
-### 'calc.calculate'
+### calc.calculate
 
 ```vim
 let result = CocAction('runCommand', 'calc.calculate', '1.5 * PI')
