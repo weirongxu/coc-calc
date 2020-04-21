@@ -1,6 +1,7 @@
-import { workspace, languages, ExtensionContext } from 'coc.nvim';
+import { workspace, languages, ExtensionContext, commands } from 'coc.nvim';
 import { Position, TextEdit } from 'vscode-languageserver-protocol';
 import { CalcProvider } from './calc-provider';
+import { calculate } from 'editor-calc';
 
 export const activate = async (context: ExtensionContext) => {
   const { subscriptions, logger } = context;
@@ -32,6 +33,13 @@ export const activate = async (context: ExtensionContext) => {
       callback: () => {
         calcProvider.clearHighlight().catch(onError);
       },
+    }),
+    commands.registerCommand('calc.calculate', (expression: string) => {
+      try {
+        return calculate(expression).result;
+      } catch (err) {
+        return null;
+      }
     }),
     // workspace.registerAutocmd({
     //   event: ['InsertLeave'],
