@@ -46,6 +46,14 @@ nmap <Leader>cr <Plug>(coc-calc-result-replace)
 - `calc.highlight`, enable calc highlight, default: `true`
 - `calc.replaceOriginalExpression`, enable relace original expression, default: `true`
 
+## API
+
+### 'calc.calculate'
+
+```vim
+let result = CocAction('runCommand', 'calc.calculate', '1.5 * PI')
+```
+
 ## Operators
 
 Precedence is from highest to lowest.
