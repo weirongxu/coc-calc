@@ -136,7 +136,7 @@ export class CalcProvider implements CompletionItemProvider {
       ];
     } catch (error) {
       if (this.enableDebug) {
-        // tslint:disable-next-line: ban
+        // eslint-disable-next-line no-restricted-properties
         workspace.showMessage(error.message, 'error');
       }
       return [];

@@ -13,7 +13,7 @@
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
     "prepare": "yarn run clean && yarn run build",
-    "test": "tslint -p ."
+    "test": "eslint 'src/**/*.ts'"
   },
   "files": [
     "lib"
@@ -58,10 +58,12 @@
   "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
     "@types/node": "^12.7.11",
+    "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "@typescript-eslint/parser": "^3.4.0",
     "coc.nvim": "^0.0.73",
     "editor-calc": "^1.1.0",
+    "eslint": "^7.3.1",
     "ts-loader": "^6.2.0",
-    "tslint": "^5.20.0",
     "typescript": "^3.6.3",
     "vscode-languageserver-protocol": "^3.14.1",
     "webpack": "^4.41.0",
