@@ -3,8 +3,8 @@
 <p align="center">
   <img src="./logo/calc-logo.svg" alt="coc-calc" width="200">
   <br>
-  <a href="https://travis-ci.com/weirongxu/coc-calc">
-    <img src="https://travis-ci.com/weirongxu/coc-calc.svg?branch=master" alt="Build Status">
+  <a href="https://github.com/weirongxu/coc-calc/actions?query=workflow%3Aci">
+    <img src="https://img.shields.io/github/workflow/status/weirongxu/coc-calc/ci" alt="Build Status">
   </a>
   <br>
   Calculate extension for coc.nvim
