@@ -29,6 +29,14 @@
    sin(PI / 2) =
    ```
 
+## Commands
+
+- `calc.appendWithCursor` Calculate and append in front of cursor
+- `calc.append` Calculate and append
+- `calc.replaceWithCursor` Calculate and replace in front of cursor
+- `calc.replace` Calculate and replace
+- `calc.calculate` see Vim API
+
 ## Keymaps
 
 Create keymappings like:

@@ -12,11 +12,10 @@ import {
   Range,
   Position,
   CancellationToken,
+  TextEdit,
 } from 'vscode-languageserver-protocol';
 
 export class CalcProvider implements CompletionItemProvider {
-  public enableActive: boolean;
-
   private srcId: number;
   private matchIds: Set<number> = new Set();
   private replacePosition?: Range;
@@ -28,7 +27,6 @@ export class CalcProvider implements CompletionItemProvider {
     private onError: (error: Error) => any,
   ) {
     this.srcId = workspace.createNameSpace('coc-calc');
-    this.enableActive = false;
     this.enableDebug = this.config.get<boolean>('debug', false);
     this.enableReplaceOriginalExpression = this.config.get<boolean>(
       'replaceOriginalExpression',
@@ -57,7 +55,7 @@ export class CalcProvider implements CompletionItemProvider {
   ): {
     skip: number;
     result: string;
-    newText: string;
+    insertText: string;
     expressionRange: Range;
     expressionWithEqualSignRange: Range;
     expressionEndRange: Range;
@@ -69,12 +67,12 @@ export class CalcProvider implements CompletionItemProvider {
     const rightMatches = formulaRaw.match(/[\s=]+$/);
     const rightEmpty = rightMatches ? rightMatches[0].length : 0;
 
-    const newText = exprLine.endsWith(' =') ? ' ' + result : result;
+    const insertText = exprLine.endsWith(' =') ? ' ' + result : result;
 
     return {
       skip,
       result,
-      newText,
+      insertText,
       expressionRange: Range.create(
         position.line,
         skip + leftEmpty,
@@ -105,7 +103,7 @@ export class CalcProvider implements CompletionItemProvider {
     const exprLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
     );
-    if (!this.enableActive && !exprLine.trimRight().endsWith('=')) {
+    if (!exprLine.trimRight().endsWith('=')) {
       return [];
     }
     try {
@@ -114,7 +112,7 @@ export class CalcProvider implements CompletionItemProvider {
         expressionRange,
         expressionWithEqualSignRange,
         expressionEndRange,
-        newText,
+        insertText,
       } = this.calculateLine(position, exprLine);
 
       this.clearHighlight().catch(this.onError);
@@ -125,13 +123,11 @@ export class CalcProvider implements CompletionItemProvider {
 
       return [
         {
-          label: newText,
+          label: insertText,
           kind: CompletionItemKind.Constant,
-          documentation: '`' + exprLine.slice(skip).trimLeft() + newText + '`',
-          textEdit: {
-            range: expressionEndRange,
-            newText,
-          },
+          documentation:
+            '`' + exprLine.slice(skip).trimLeft() + insertText + '`',
+          textEdit: TextEdit.replace(expressionEndRange, insertText),
         } as CompletionItem,
       ];
     } catch (error) {

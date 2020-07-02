@@ -1,4 +1,10 @@
-import { workspace, languages, ExtensionContext, commands } from 'coc.nvim';
+import {
+  workspace,
+  languages,
+  ExtensionContext,
+  commands,
+  Document,
+} from 'coc.nvim';
 import { Position, TextEdit } from 'vscode-languageserver-protocol';
 import { CalcProvider } from './calc-provider';
 import { calculate } from 'editor-calc';
@@ -41,58 +47,73 @@ export const activate = async (context: ExtensionContext) => {
         return null;
       }
     }),
-    // workspace.registerAutocmd({
-    //   event: ['InsertLeave'],
-    //   callback: () => {
-    //     calcProvider.enableActive = false;
-    //   }
-    // }),
     // workspace.registerKeymap(['n'], 'calc-active-mode-i', async () => {
     //   await nvim.feedKeys('i', 'n', false);
-    //   calcProvider.enableActive = true;
+    //   // TODO enableActive
     // }),
   );
 
-  async function replaceResult(mode: 'append' | 'replace') {
-    const doc = await workspace.document;
-    const position = await workspace.getCursorPosition();
-    const line = doc.getline(position.line);
-    const equalPosition = line.indexOf('=', position.character - 1);
-    const character = equalPosition === -1 ? line.length : equalPosition + 1;
-    const exprLine = line.slice(0, character);
+  async function replaceResultWithPosition(
+    doc: Document,
+    position: Position,
+    expression: string,
+    mode: 'append' | 'replace',
+  ) {
     const {
-      newText,
+      insertText,
       expressionWithEqualSignRange,
       expressionEndRange,
-    } = calcProvider.calculateLine(
-      Position.create(position.line, character),
-      exprLine,
-    );
+    } = calcProvider.calculateLine(position, expression);
     if (mode === 'append') {
-      const endWithEqual = exprLine.trimRight().endsWith('=');
-      doc
-        .applyEdits(nvim, [
-          TextEdit.replace(
-            expressionEndRange,
-            endWithEqual ? newText : ' = ' + newText,
-          ),
-        ])
-        .catch(onError);
+      const endWithEqual = expression.trimRight().endsWith('=');
+      await doc.applyEdits([
+        TextEdit.replace(
+          expressionEndRange,
+          endWithEqual ? insertText : ' = ' + insertText,
+        ),
+      ]);
     } else if (mode === 'replace') {
-      doc
-        .applyEdits(nvim, [
-          TextEdit.replace(expressionWithEqualSignRange, newText),
-        ])
-        .catch(onError);
+      await doc.applyEdits([
+        TextEdit.replace(expressionWithEqualSignRange, insertText),
+      ]);
     }
   }
 
+  async function replaceResult(
+    mode: 'append' | 'replace',
+    withCursor: boolean,
+  ) {
+    const doc = await workspace.document;
+    const cursor = await workspace.getCursorPosition();
+    const line = doc.getline(cursor.line);
+    const [position, expression] = ((): [Position, string] => {
+      if (withCursor) {
+        return [cursor, line.slice(0, cursor.character)];
+      } else {
+        return [Position.create(cursor.line, line.length), line];
+      }
+    })();
+    await replaceResultWithPosition(doc, position, expression, mode);
+  }
+
   subscriptions.push(
+    commands.registerCommand('calc.appendWithCursor', async () => {
+      await replaceResult('append', true);
+    }),
+    commands.registerCommand('calc.append', async () => {
+      await replaceResult('append', false);
+    }),
+    commands.registerCommand('calc.replaceWithCursor', async () => {
+      await replaceResult('replace', true);
+    }),
+    commands.registerCommand('calc.replace', async () => {
+      await replaceResult('replace', false);
+    }),
     workspace.registerKeymap(['n', 'i'], 'calc-result-append', async () => {
-      await replaceResult('append');
+      await commands.executeCommand('calc.append');
     }),
     workspace.registerKeymap(['n', 'i'], 'calc-result-replace', async () => {
-      await replaceResult('replace');
+      await commands.executeCommand('calc.replace');
     }),
   );
 };
