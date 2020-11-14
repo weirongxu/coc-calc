@@ -6,7 +6,6 @@ import {
 } from 'coc.nvim';
 import { calculate } from 'editor-calc';
 import {
-  TextDocument,
   CompletionItem,
   CompletionItemKind,
   Range,
@@ -14,10 +13,10 @@ import {
   CancellationToken,
   TextEdit,
 } from 'vscode-languageserver-protocol';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class CalcProvider implements CompletionItemProvider {
-  private srcId: number;
-  private matchIds: Set<number> = new Set();
+  private highlightKey = 'coc-calc';
   private replacePosition?: Range;
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
@@ -26,7 +25,6 @@ export class CalcProvider implements CompletionItemProvider {
     public config: WorkspaceConfiguration,
     private onError: (error: Error) => any,
   ) {
-    this.srcId = workspace.createNameSpace('coc-calc');
     this.enableDebug = this.config.get<boolean>('debug', false);
     this.enableReplaceOriginalExpression = this.config.get<boolean>(
       'replaceOriginalExpression',
@@ -36,17 +34,18 @@ export class CalcProvider implements CompletionItemProvider {
 
   public async highlight(range: Range) {
     const document = await workspace.document;
-    const matchIds = document.highlightRanges(
+    document.highlightRanges(
       [range],
       'CocCalcFormule',
-      this.srcId,
+      // @ts-ignore
+      this.highlightKey,
     );
-    matchIds.forEach((id) => this.matchIds.add(id));
   }
 
   public async clearHighlight() {
     const document = await workspace.document;
-    document.clearMatchIds(this.matchIds);
+    // @ts-ignore
+    document.clearNamespace(this.highlightKey);
   }
 
   public calculateLine(
