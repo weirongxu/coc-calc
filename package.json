@@ -13,7 +13,7 @@
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
     "prepare": "yarn run clean && yarn run build",
-    "test": "eslint 'src/**/*.ts'"
+    "test": "eslint src --ext .js,.ts"
   },
   "files": [
     "lib"
