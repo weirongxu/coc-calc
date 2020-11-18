@@ -16,7 +16,7 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class CalcProvider implements CompletionItemProvider {
-  private highlightKey = 'coc-calc';
+  private srcId = workspace.createNameSpace('coc-calc');
   private replacePosition?: Range;
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
@@ -34,18 +34,12 @@ export class CalcProvider implements CompletionItemProvider {
 
   public async highlight(range: Range) {
     const document = await workspace.document;
-    document.highlightRanges(
-      [range],
-      'CocCalcFormule',
-      // @ts-ignore
-      this.highlightKey,
-    );
+    document.buffer.highlightRanges(this.srcId, 'CocCalcFormule', [range]);
   }
 
   public async clearHighlight() {
     const document = await workspace.document;
-    // @ts-ignore
-    document.clearNamespace(this.highlightKey);
+    document.buffer.clearNamespace(this.srcId);
   }
 
   public calculateLine(
