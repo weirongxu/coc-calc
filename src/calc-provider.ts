@@ -1,19 +1,18 @@
 import {
-  workspace,
-  CompletionItemProvider,
+  CancellationToken,
   CompletionContext,
+  CompletionItem,
+  CompletionItemKind,
+  CompletionItemProvider,
+  Position,
+  Range,
+  TextDocument,
+  TextEdit,
+  window,
+  workspace,
   WorkspaceConfiguration,
 } from 'coc.nvim';
 import { calculate } from 'editor-calc';
-import {
-  CompletionItem,
-  CompletionItemKind,
-  Range,
-  Position,
-  CancellationToken,
-  TextEdit,
-} from 'vscode-languageserver-protocol';
-import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class CalcProvider implements CompletionItemProvider {
   private srcId = workspace.createNameSpace('coc-calc');
@@ -124,9 +123,9 @@ export class CalcProvider implements CompletionItemProvider {
         } as CompletionItem,
       ];
     } catch (error) {
-      if (this.enableDebug) {
+      if (this.enableDebug && error instanceof Error) {
         // eslint-disable-next-line no-restricted-properties
-        workspace.showMessage(error.message, 'error');
+        window.showMessage(error.message, 'error');
       }
       return [];
     }

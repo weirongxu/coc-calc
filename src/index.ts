@@ -1,13 +1,15 @@
 import {
-  workspace,
-  languages,
-  ExtensionContext,
   commands,
   Document,
+  ExtensionContext,
+  languages,
+  Position,
+  TextEdit,
+  window,
+  workspace,
 } from 'coc.nvim';
-import { Position, TextEdit } from 'vscode-languageserver-protocol';
-import { CalcProvider } from './calc-provider';
 import { calculate } from 'editor-calc';
+import { CalcProvider } from './calc-provider';
 
 export const activate = async (context: ExtensionContext) => {
   const { subscriptions, logger } = context;
@@ -59,11 +61,8 @@ export const activate = async (context: ExtensionContext) => {
     expression: string,
     mode: 'append' | 'replace',
   ) {
-    const {
-      insertText,
-      expressionWithEqualSignRange,
-      expressionEndRange,
-    } = calcProvider.calculateLine(position, expression);
+    const { insertText, expressionWithEqualSignRange, expressionEndRange } =
+      calcProvider.calculateLine(position, expression);
     if (mode === 'append') {
       const endWithEqual = expression.trimRight().endsWith('=');
       await doc.applyEdits([
@@ -84,7 +83,7 @@ export const activate = async (context: ExtensionContext) => {
     withCursor: boolean,
   ) {
     const doc = await workspace.document;
-    const cursor = await workspace.getCursorPosition();
+    const cursor = await window.getCursorPosition();
     const line = doc.getline(cursor.line);
     const [position, expression] = ((): [Position, string] => {
       if (withCursor) {
