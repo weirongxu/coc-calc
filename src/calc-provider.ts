@@ -15,7 +15,7 @@ import {
 import { calculate } from 'editor-calc';
 
 export class CalcProvider implements CompletionItemProvider {
-  private srcId = workspace.createNameSpace('coc-calc');
+  private srcId = 'coc-calc';
   private replacePosition?: Range;
   private enableDebug: boolean;
   private enableReplaceOriginalExpression: boolean;
