@@ -33,11 +33,6 @@
           "type": "boolean",
           "default": false
         },
-        "calc.replaceOriginalExpression": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable relace original expression"
-        },
         "calc.priority": {
           "type": "integer",
           "default": 1000,
@@ -57,16 +52,19 @@
   "homepage": "https://github.com/weirongxu/coc-calc",
   "repository": "https://github.com/weirongxu/coc-calc.git",
   "devDependencies": {
-    "@types/node": "^16.11.0",
-    "@typescript-eslint/eslint-plugin": "^4.8.1",
-    "@typescript-eslint/parser": "^4.8.1",
-    "coc.nvim": "^0.0.81-next.7",
+    "@raidou/eslint-config-base": "^1.6.0",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "coc-helper": "^0.15.2",
+    "coc.nvim": "^0.0.83-next.9",
     "editor-calc": "^2.0.2",
-    "esbuild": "^0.13.6",
-    "eslint": "^7.13.0",
+    "esbuild": "^0.15.13",
+    "eslint": "^8.27.0",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.0.5",
-    "vscode-languageserver-protocol": "^3.15.3",
-    "vscode-languageserver-textdocument": "^1.0.1"
+    "typescript": "^4.8.4",
+    "vscode-languageserver-protocol": "^3.17.2",
+    "vscode-languageserver-textdocument": "^1.0.7"
   }
 }

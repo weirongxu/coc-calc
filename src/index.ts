@@ -10,9 +10,10 @@ import {
 } from 'coc.nvim';
 import { calculate } from 'editor-calc';
 import { CalcProvider } from './calc-provider';
+import { logger } from './util';
 
 export const activate = async (context: ExtensionContext) => {
-  const { subscriptions, logger } = context;
+  const { subscriptions } = context;
   const config = workspace.getConfiguration('calc');
   const { nvim } = workspace;
 
@@ -23,9 +24,7 @@ export const activate = async (context: ExtensionContext) => {
     );
   }
 
-  const onError = logger.error.bind(logger);
-
-  const calcProvider = new CalcProvider(config, onError);
+  const calcProvider = new CalcProvider(config);
 
   subscriptions.push(
     languages.registerCompletionItemProvider(
@@ -39,7 +38,7 @@ export const activate = async (context: ExtensionContext) => {
     workspace.registerAutocmd({
       event: ['CursorMoved', 'CursorMovedI', 'InsertLeave'],
       callback: () => {
-        calcProvider.clearHighlight().catch(onError);
+        calcProvider.clearHighlight().catch(logger.error);
       },
     }),
     commands.registerCommand('calc.calculate', (expression: string) => {
@@ -64,11 +63,11 @@ export const activate = async (context: ExtensionContext) => {
     const { insertText, expressionWithEqualSignRange, expressionEndRange } =
       calcProvider.calculateLine(position, expression);
     if (mode === 'append') {
-      const endWithEqual = expression.trimRight().endsWith('=');
+      const endWithEqual = expression.trimEnd().endsWith('=');
       await doc.applyEdits([
         TextEdit.replace(
           expressionEndRange,
-          endWithEqual ? insertText : ' = ' + insertText,
+          endWithEqual ? insertText : ` = ${insertText}`,
         ),
       ]);
     } else if (mode === 'replace') {
@@ -96,18 +95,30 @@ export const activate = async (context: ExtensionContext) => {
   }
 
   subscriptions.push(
-    commands.registerCommand('calc.appendWithCursor', async () => {
-      await replaceResult('append', true);
-    }),
-    commands.registerCommand('calc.append', async () => {
-      await replaceResult('append', false);
-    }),
-    commands.registerCommand('calc.replaceWithCursor', async () => {
-      await replaceResult('replace', true);
-    }),
-    commands.registerCommand('calc.replace', async () => {
-      await replaceResult('replace', false);
-    }),
+    commands.registerCommand(
+      'calc.appendWithCursor',
+      logger.asyncCatch(async () => {
+        await replaceResult('append', true);
+      }),
+    ),
+    commands.registerCommand(
+      'calc.append',
+      logger.asyncCatch(async () => {
+        await replaceResult('append', false);
+      }),
+    ),
+    commands.registerCommand(
+      'calc.replaceWithCursor',
+      logger.asyncCatch(async () => {
+        await replaceResult('replace', true);
+      }),
+    ),
+    commands.registerCommand(
+      'calc.replace',
+      logger.asyncCatch(async () => {
+        await replaceResult('replace', false);
+      }),
+    ),
     workspace.registerKeymap(['n', 'i'], 'calc-result-append', async () => {
       await commands.executeCommand('calc.append');
     }),

@@ -1,6 +1,4 @@
 import {
-  CancellationToken,
-  CompletionContext,
   CompletionItem,
   CompletionItemKind,
   CompletionItemProvider,
@@ -13,22 +11,14 @@ import {
   WorkspaceConfiguration,
 } from 'coc.nvim';
 import { calculate } from 'editor-calc';
+import { logger } from './util';
 
 export class CalcProvider implements CompletionItemProvider {
   private srcId = 'coc-calc';
-  private replacePosition?: Range;
   private enableDebug: boolean;
-  private enableReplaceOriginalExpression: boolean;
 
-  constructor(
-    public config: WorkspaceConfiguration,
-    private onError: (error: Error) => any,
-  ) {
+  constructor(public config: WorkspaceConfiguration) {
     this.enableDebug = this.config.get<boolean>('debug', false);
-    this.enableReplaceOriginalExpression = this.config.get<boolean>(
-      'replaceOriginalExpression',
-      true,
-    );
   }
 
   public async highlight(range: Range) {
@@ -59,7 +49,7 @@ export class CalcProvider implements CompletionItemProvider {
     const rightMatches = formulaRaw.match(/[\s=]+$/);
     const rightEmpty = rightMatches ? rightMatches[0].length : 0;
 
-    const insertText = exprLine.endsWith(' =') ? ' ' + result : result;
+    const insertText = exprLine.endsWith(' =') ? ` ${result}` : result;
 
     return {
       skip,
@@ -89,13 +79,11 @@ export class CalcProvider implements CompletionItemProvider {
   public async provideCompletionItems(
     document: TextDocument,
     position: Position,
-    _token: CancellationToken,
-    _context: CompletionContext,
   ): Promise<CompletionItem[]> {
     const exprLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
     );
-    if (!exprLine.trimRight().endsWith('=')) {
+    if (!exprLine.trimEnd().endsWith('=')) {
       return [];
     }
     try {
@@ -105,42 +93,33 @@ export class CalcProvider implements CompletionItemProvider {
         expressionWithEqualSignRange,
         expressionEndRange,
         insertText,
+        result,
       } = this.calculateLine(position, exprLine);
 
-      this.clearHighlight().catch(this.onError);
+      this.clearHighlight().catch(logger.error);
 
-      this.highlight(expressionRange).catch(this.onError);
+      this.highlight(expressionRange).catch(logger.error);
 
-      this.replacePosition = expressionWithEqualSignRange;
-
-      return [
+      const items: CompletionItem[] = [
         {
-          label: insertText,
+          label: result,
           kind: CompletionItemKind.Constant,
-          documentation:
-            '`' + exprLine.slice(skip).trimLeft() + insertText + '`',
-          textEdit: TextEdit.replace(expressionEndRange, insertText),
+          documentation: `append \`${exprLine.slice(skip)}${insertText}\``,
+          textEdit: TextEdit.insert(expressionEndRange.end, insertText),
+        } as CompletionItem,
+        {
+          label: result,
+          kind: CompletionItemKind.Constant,
+          documentation: `replace \`${exprLine.slice(skip)}\` -> \`${result}\``,
+          textEdit: TextEdit.replace(expressionWithEqualSignRange, result),
         } as CompletionItem,
       ];
+      return items;
     } catch (error) {
       if (this.enableDebug && error instanceof Error) {
-        // eslint-disable-next-line no-restricted-properties
-        window.showMessage(error.message, 'error');
+        await window.showErrorMessage(error.message, 'error');
       }
       return [];
     }
-  }
-
-  async resolveCompletionItem(
-    item: CompletionItem,
-    _token: CancellationToken,
-  ): Promise<CompletionItem> {
-    if (this.enableReplaceOriginalExpression) {
-      item.textEdit = {
-        range: this.replacePosition!,
-        newText: item.textEdit!.newText.trim(),
-      };
-    }
-    return item;
   }
 }
