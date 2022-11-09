@@ -52,7 +52,6 @@ nmap <Leader>cr <Plug>(coc-calc-result-replace)
 
 - `calc.priority`, calc priority, default: `1000`
 - `calc.highlight`, enable calc highlight, default: `true`
-- `calc.replaceOriginalExpression`, enable relace original expression, default: `true`
 
 ## Vim API
 
