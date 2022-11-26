@@ -105,7 +105,7 @@ export class CalcProvider implements CompletionItemProvider {
           label: result,
           kind: CompletionItemKind.Constant,
           documentation: `append \`${exprLine.slice(skip)}${insertText}\``,
-          textEdit: TextEdit.insert(expressionEndRange.end, insertText),
+          textEdit: TextEdit.replace(expressionEndRange, insertText),
         } as CompletionItem,
         {
           label: result,
