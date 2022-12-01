@@ -1,3 +1,3 @@
-import { HelperLogger } from 'coc-helper';
+import { HelperLogger } from 'coc-helper'
 
-export const logger = new HelperLogger('calc');
+export const logger = new HelperLogger('calc')

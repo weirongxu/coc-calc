@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 exports.build = (production, watch) => {
   require('esbuild')
     .build({
@@ -14,13 +16,13 @@ exports.build = (production, watch) => {
     })
     .catch((err) => {
       // eslint-disable-next-line no-console
-      console.error(err);
-      process.exit(1);
-    });
-};
+      console.error(err)
+      process.exit(1)
+    })
+}
 
 if (require.main === module) {
-  exports.build(true, false);
+  exports.build(true, false)
   // eslint-disable-next-line no-console
-  console.log('build done');
+  console.log('build done')
 }

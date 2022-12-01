@@ -1,3 +1,5 @@
-const { build } = require('./build');
+/* eslint-disable @typescript-eslint/no-var-requires */
 
-build(false, true);
+const { build } = require('./build')
+
+build(false, true)

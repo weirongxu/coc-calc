@@ -9,47 +9,51 @@ import {
   window,
   workspace,
   WorkspaceConfiguration,
-} from 'coc.nvim';
-import { calculate } from 'editor-calc';
-import { logger } from './util';
+} from 'coc.nvim'
+import { calculate } from 'editor-calc'
+import { logger } from './util'
 
 export class CalcProvider implements CompletionItemProvider {
-  private srcId = 'coc-calc';
-  private enableDebug: boolean;
+  private srcId = 'coc-calc'
+  private enableDebug: boolean
 
   constructor(public config: WorkspaceConfiguration) {
-    this.enableDebug = this.config.get<boolean>('debug', false);
+    this.enableDebug = this.config.get<boolean>('debug', false)
   }
 
   public async highlight(range: Range) {
-    const document = await workspace.document;
-    document.buffer.highlightRanges(this.srcId, 'CocCalcFormule', [range]);
+    await this.clearHighlight().catch(logger.error)
+
+    const document = await workspace.document
+    workspace.nvim.pauseNotification()
+    document.buffer.highlightRanges(this.srcId, 'CocCalcFormule', [range], true)
+    await workspace.nvim.resumeNotification()
   }
 
   public async clearHighlight() {
-    const document = await workspace.document;
-    document.buffer.clearNamespace(this.srcId);
+    const document = await workspace.document
+    workspace.nvim.pauseNotification()
+    document.buffer.clearNamespace(this.srcId)
+    await workspace.nvim.resumeNotification()
   }
 
   public calculateLine(
     position: Position,
     exprLine: string,
   ): {
-    skip: number;
-    result: string;
-    insertText: string;
-    expressionRange: Range;
-    expressionWithEqualSignRange: Range;
-    expressionEndRange: Range;
+    skip: number
+    result: string
+    insertText: string
+    expressionRange: Range
+    expressionWithEqualSignRange: Range
+    expressionEndRange: Range
   } {
-    const { skip, result } = calculate(exprLine);
-    const formulaRaw = exprLine.slice(skip);
-    const leftMatches = formulaRaw.match(/^\s+/);
-    const leftEmpty = leftMatches ? leftMatches[0].length : 0;
-    const rightMatches = formulaRaw.match(/[\s=]+$/);
-    const rightEmpty = rightMatches ? rightMatches[0].length : 0;
+    const { skip, result } = calculate(exprLine)
+    const formulaRaw = exprLine.slice(skip)
+    const rightMatches = formulaRaw.match(/[\s=]+$/)
+    const rightEmpty = rightMatches ? rightMatches[0].length : 0
 
-    const insertText = exprLine.endsWith(' =') ? ` ${result}` : result;
+    const insertText = exprLine.endsWith(' =') ? ` ${result}` : result
 
     return {
       skip,
@@ -57,13 +61,13 @@ export class CalcProvider implements CompletionItemProvider {
       insertText,
       expressionRange: Range.create(
         position.line,
-        skip + leftEmpty,
+        skip,
         position.line,
         position.character - rightEmpty,
       ),
       expressionWithEqualSignRange: Range.create(
         position.line,
-        skip + leftEmpty,
+        skip,
         position.line,
         position.character,
       ),
@@ -73,7 +77,7 @@ export class CalcProvider implements CompletionItemProvider {
         position.line,
         position.character,
       ),
-    };
+    }
   }
 
   public async provideCompletionItems(
@@ -82,9 +86,9 @@ export class CalcProvider implements CompletionItemProvider {
   ): Promise<CompletionItem[]> {
     const exprLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
-    );
+    )
     if (!exprLine.trimEnd().endsWith('=')) {
-      return [];
+      return []
     }
     try {
       const {
@@ -94,11 +98,9 @@ export class CalcProvider implements CompletionItemProvider {
         expressionEndRange,
         insertText,
         result,
-      } = this.calculateLine(position, exprLine);
+      } = this.calculateLine(position, exprLine)
 
-      this.clearHighlight().catch(logger.error);
-
-      this.highlight(expressionRange).catch(logger.error);
+      this.highlight(expressionRange).catch(logger.error)
 
       const items: CompletionItem[] = [
         {
@@ -113,13 +115,13 @@ export class CalcProvider implements CompletionItemProvider {
           documentation: `replace \`${exprLine.slice(skip)}\` -> \`${result}\``,
           textEdit: TextEdit.replace(expressionWithEqualSignRange, result),
         } as CompletionItem,
-      ];
-      return items;
+      ]
+      return items
     } catch (error) {
       if (this.enableDebug && error instanceof Error) {
-        await window.showErrorMessage(error.message, 'error');
+        await window.showErrorMessage(error.message, 'error')
       }
-      return [];
+      return []
     }
   }
 }

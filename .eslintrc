@@ -2,6 +2,7 @@
   "root": true,
   "extends": ["@raidou/eslint-config-base"],
   "env": {
-    "es6": true
+    "es6": true,
+    "node": true
   }
 }
