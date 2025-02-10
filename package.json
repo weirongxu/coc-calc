@@ -59,7 +59,7 @@
     "coc-helper": "^0.15.2",
     "coc.nvim": "^0.0.83-next.9",
     "editor-calc": "^2.1.2",
-    "esbuild": "^0.15.16",
+    "esbuild": "^0.25.0",
     "eslint": "^8.28.0",
     "prettier": "^2.8.0",
     "rimraf": "^3.0.2",
